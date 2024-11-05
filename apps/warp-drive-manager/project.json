@@ -3,20 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/warp-drive-manager",
   "projectType": "application",
-  "targets": {
-    "build": {
-      "executor": "@nx/next:build"
-    },
-    "serve-static": {
-      "executor": "@nx/web:file-server",
-      "options": {
-        "port": 4205
-      }
-    },
-    "serve": {},
-    "export": {},
-    "test": {},
-    "lint": {}
-  },
+  "targets": {},
   "tags": []
 }

@@ -6,18 +6,14 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/rollup:rollup",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nx/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/shared/buttons",
         "tsConfig": "libs/shared/buttons/tsconfig.lib.json",
         "project": "libs/shared/buttons/package.json",
         "entryFile": "libs/shared/buttons/src/index.ts",
-        "external": [
-          "react/jsx-runtime"
-        ],
+        "external": ["react/jsx-runtime"],
         "rollupConfig": "@nx/react/plugins/bundle-rollup",
         "assets": [
           {

@@ -321,7 +321,8 @@
       ],
       "@interstellar/warp-drive-manager/important-feature-9": [
         "libs/warp-drive-manager/important-feature-9/src/index.ts"
-      ]
+      ],
+      "react": ["./node_modules/@types/react"]
     }
   },
   "exclude": ["node_modules", "tmp"]

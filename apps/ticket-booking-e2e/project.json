@@ -1,7 +1,5 @@
 {
   "name": "ticket-booking-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "targets": {
-    "lint": {}
-  }
+  "targets": {}
 }
