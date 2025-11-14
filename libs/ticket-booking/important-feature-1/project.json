@@ -3,9 +3,6 @@
   "sourceRoot": "libs/ticket-booking/important-feature-1/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "lint": {},
-    "test": {}
-  },
+  "targets": {},
   "name": "ticket-booking-important-feature-1"
 }

@@ -43,4 +43,6 @@ Thumbs.db
 
 .cursorindexingignore
 .specstory/
-.yarnrc.yml
+.yarn/
+.next/
+.tsbuildinfo

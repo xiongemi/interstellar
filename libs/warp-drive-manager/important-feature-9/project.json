@@ -3,9 +3,6 @@
   "sourceRoot": "libs/warp-drive-manager/important-feature-9/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "lint": {},
-    "test": {}
-  },
+  "targets": {},
   "name": "warp-drive-manager-important-feature-9"
 }

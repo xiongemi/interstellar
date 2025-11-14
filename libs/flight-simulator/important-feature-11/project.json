@@ -3,9 +3,6 @@
   "sourceRoot": "libs/flight-simulator/important-feature-11/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "lint": {},
-    "test": {}
-  },
+  "targets": {},
   "name": "flight-simulator-important-feature-11"
 }

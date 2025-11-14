@@ -3,20 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ticket-booking",
   "projectType": "application",
-  "targets": {
-    "build": {
-      "executor": "@nx/next:build"
-    },
-    "serve-static": {
-      "executor": "@nx/web:file-server",
-      "options": {
-        "port": 4204
-      }
-    },
-    "serve": {},
-    "export": {},
-    "test": {},
-    "lint": {}
-  },
+  "targets": {},
   "tags": []
 }

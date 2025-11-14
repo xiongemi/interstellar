@@ -3,9 +3,6 @@
   "sourceRoot": "libs/crew/important-feature-6/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "lint": {},
-    "test": {}
-  },
+  "targets": {},
   "name": "crew-important-feature-6"
 }

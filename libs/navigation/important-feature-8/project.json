@@ -3,9 +3,6 @@
   "sourceRoot": "libs/navigation/important-feature-8/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "lint": {},
-    "test": {}
-  },
+  "targets": {},
   "name": "navigation-important-feature-8"
 }
