@@ -63,5 +63,6 @@
     "webpack": "^5.75.0",
     "webpack-merge": "^5.8.0",
     "@nx/next": "17.2.0-beta.6"
-  }
+  },
+  "packageManager": "yarn@4.5.1"
 }
