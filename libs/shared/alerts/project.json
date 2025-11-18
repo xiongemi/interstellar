@@ -3,26 +3,5 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/alerts/src",
   "projectType": "library",
-  "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/shared/alerts",
-        "tsConfig": "libs/shared/alerts/tsconfig.lib.json",
-        "project": "libs/shared/alerts/package.json",
-        "entryFile": "libs/shared/alerts/src/index.ts",
-        "external": ["react/jsx-runtime"],
-        "rollupConfig": "@nx/react/plugins/bundle-rollup",
-        "assets": [
-          {
-            "glob": "libs/shared/alerts/README.md",
-            "input": ".",
-            "output": "."
-          }
-        ]
-      }
-    }
-  }
+  "tags": []
 }

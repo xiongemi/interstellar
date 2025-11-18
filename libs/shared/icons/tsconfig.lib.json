@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../../dist/out-tsc",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "../../../dist/out-tsc/libs/shared/icons",
     "types": ["node"]
   },
   "files": [
@@ -9,5 +12,5 @@
     "../../../node_modules/@nx/react/typings/image.d.ts"
   ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "**/*.spec.tsx", "**/*.test.tsx"],
-  "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

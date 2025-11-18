@@ -9,5 +9,19 @@
     "../../../node_modules/@nx/react/typings/image.d.ts"
   ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "**/*.spec.tsx", "**/*.test.tsx"],
-  "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+  "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+  "references": [
+    {
+      "path": "../../shared/buttons/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/icons/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/alerts/tsconfig.lib.json"
+    },
+    {
+      "path": "../../shared/components/tsconfig.lib.json"
+    }
+  ]
 }

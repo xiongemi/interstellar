@@ -12533,7 +12533,6 @@ __metadata:
     "@nx/js": "npm:22.0.3"
     "@nx/next": "npm:22.0.3"
     "@nx/react": "npm:22.0.3"
-    "@nx/rollup": "npm:22.0.3"
     "@nx/web": "npm:22.0.3"
     "@nx/webpack": "npm:22.0.3"
     "@nx/workspace": "npm:22.0.3"

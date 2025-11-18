@@ -26,14 +26,7 @@
     "@nx/eslint/plugin",
     "@nx/jest/plugin",
     "@nx/next/plugin",
-    {
-      "plugin": "@nx/rollup/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    }
+    "@nx/js/typescript"
   ],
   "nxCloudAccessToken": "NTY1ZDkzMTEtNTI3Ny00MWJhLTgwMTQtMDhiNGQxZWRkOThifHJlYWQtd3JpdGU=",
   "nxCloudUrl": "https://staging.nx.app"
