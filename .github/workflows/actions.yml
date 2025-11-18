@@ -15,15 +15,15 @@ jobs:
     timeout-minutes: 240
     if: ${{ github.event_name != 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Checkout [main]
         with:
           fetch-depth: 0
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v2
-      - uses: actions/setup-node@v6
+        uses: nrwl/nx-set-shas@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - run: yarn install --frozen-lockfile
       - name: Run verification
         run: 'npx nx affected -t build test lint --parallel 1 --no-cloud && npx nx affected -t e2e-ci --parallel 1 --no-cloud'
@@ -35,13 +35,13 @@ jobs:
     timeout-minutes: 240
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Start CI run
         run: 'npx nx-cloud start-ci-run --distributes-on="15 linux-medium-plus-js" --stop-agents-after="e2e-ci"'
       - run: yarn install --frozen-lockfile
