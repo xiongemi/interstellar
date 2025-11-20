@@ -1,5 +1,8 @@
 {
   "name": "crew-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "targets": {}
+  "sourceRoot": "apps/crew-e2e",
+  "projectType": "application",
+  "targets": {},
+  "tags": ["e2e"]
 }

@@ -3,6 +3,12 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ticket-booking",
   "projectType": "application",
-  "targets": {},
+  "targets": {
+    "start": {
+      "options": {
+        "port": 3004
+      }
+    }
+  },
   "tags": []
 }

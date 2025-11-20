@@ -11,7 +11,12 @@ function CustomApp({ Component, pageProps }: AppProps) {
       </Head>
       <div className="app">
         <header className="flex">
-          <Image src="/nx-logo-white.svg" alt="Nx logo" width={75} height={50} />
+          <Image
+            src="/nx-logo-white.svg"
+            alt="Nx logo"
+            width={75}
+            height={50}
+          />
           <h1>Welcome to warp-drive-manager!</h1>
         </header>
         <main>

@@ -1,9 +1,11 @@
 # Nx Agents Demo
+
 #### On how to make your CI 10 times faster with a single line change
 
 This repo shows how using Nx Managed Agents you can distribute your CI reducing its time from hours to minutes.
 
 ## Video
+
 <br>
 <a href="https://youtu.be/KPCMg_Dn0EoE">
 <img src="readme-resources/video-thumbnail.png" alt='video' width="600">
@@ -12,15 +14,15 @@ This repo shows how using Nx Managed Agents you can distribute your CI reducing 
 
 ## Repository
 
-* 5 shared buildable packages/libraries with 250 components each
-* 5 Next.js applications built out of 20 app-specific libraries. Each app-specific lib has 250 components each. Each library uses the shared components.
+- 5 shared buildable packages/libraries with 250 components each
+- 5 Next.js applications built out of 20 app-specific libraries. Each app-specific lib has 250 components each. Each library uses the shared components.
 
 ## Baseline
 
 The CI for this repo is implemented as follows:
 
 ```
-npx nx affected -t export test lint --parallel 1 && npx nx affected -t e2e --parallel 1 
+npx nx affected -t export test lint --parallel 1 && npx nx affected -t e2e --parallel 1
 ```
 
 The job takes 87 minutes.
@@ -89,8 +91,3 @@ The reason why this repo isn’t a comparison to, say, Turborepo or any other mo
 Comparisons are easy to understand. If Tool A is 9 times faster than Tool B, then A is better. But if there is no B, it’s hard to explain why A is really cool.
 
 Local and remote caching are useful, but distribution is truly transformative. Unfortunately, unless you worked at Google/Facebook/etc you won't know that that's the case. This repo is my attempt to show why distribution is a gamer changer for a lot of projects.
-
-
-
-
-
