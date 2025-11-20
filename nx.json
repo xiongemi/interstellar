@@ -19,6 +19,12 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "lint": {
+      "options": {
+        "cache": true,
+        "cache-strategy": "content"
+      }
     }
   },
   "plugins": [
