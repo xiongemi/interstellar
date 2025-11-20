@@ -6,7 +6,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:4204',
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
-      webServerCommands: { default: 'nx run ticket-booking:serve' },
+      webServerCommands: { default: 'nx run ticket-booking:start' },
       ciWebServerCommand: 'nx run ticket-booking:serve-static',
     }),
     // Please ensure you use `cy.origin()` when navigating between domains and remove this option.

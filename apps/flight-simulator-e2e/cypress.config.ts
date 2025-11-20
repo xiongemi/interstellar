@@ -6,7 +6,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:4202',
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
-      webServerCommands: { default: 'nx run flight-simulator:serve' },
+      webServerCommands: { default: 'nx run flight-simulator:start' },
       ciWebServerCommand: 'nx run flight-simulator:serve-static',
     }),
     // Please ensure you use `cy.origin()` when navigating between domains and remove this option.

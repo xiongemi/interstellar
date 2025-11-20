@@ -6,7 +6,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:4201',
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
-      webServerCommands: { default: 'nx run crew:serve' },
+      webServerCommands: { default: 'nx run crew:start' },
       ciWebServerCommand: 'nx run crew:serve-static',
     }),
     // Please ensure you use `cy.origin()` when navigating between domains and remove this option.

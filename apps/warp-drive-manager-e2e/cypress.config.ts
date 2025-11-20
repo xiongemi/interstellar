@@ -6,7 +6,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:4205',
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
-      webServerCommands: { default: 'nx run warp-drive-manager:serve' },
+      webServerCommands: { default: 'nx run warp-drive-manager:start' },
       ciWebServerCommand: 'nx run warp-drive-manager:serve-static',
     }),
     // Please ensure you use `cy.origin()` when navigating between domains and remove this option.
