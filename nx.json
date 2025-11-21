@@ -27,7 +27,5 @@
     "@nx/jest/plugin",
     "@nx/next/plugin",
     "@nx/js/typescript"
-  ],
-  "nxCloudAccessToken": "NTY1ZDkzMTEtNTI3Ny00MWJhLTgwMTQtMDhiNGQxZWRkOThifHJlYWQtd3JpdGU=",
-  "nxCloudUrl": "https://staging.nx.app"
+  ]
 }
