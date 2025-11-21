@@ -34,7 +34,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/*.js', '**/*.ts', '**/*.tsx', '.eslintrc*') }}
+          key: eslint-${{ hashFiles('.eslintrc*') }}
+          restore-keys: eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
@@ -68,12 +69,11 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/*.js', '**/*.ts', '**/*.tsx', '.eslintrc*') }}
+          key: eslint-${{ hashFiles('.eslintrc*') }}
+          restore-keys: eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Run e2e
-        run: 'yarn nx affected -t e2d --parallel=3'
