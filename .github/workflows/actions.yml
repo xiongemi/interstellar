@@ -19,8 +19,6 @@ jobs:
         name: Checkout [main]
         with:
           fetch-depth: 0
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -32,6 +30,12 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
+      - name: Cache eslint cache
+        uses: actions/cache@v4
+        with:
+          path: '**/.eslintcache'
+          key: eslint-${{ hashFiles('.eslintrc*') }}
+          restore-keys: eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
@@ -61,11 +65,15 @@ jobs:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
+      - name: Cache eslint cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.eslintcache'
+          key: eslint-${{ hashFiles('.eslintrc*') }}
+          restore-keys: eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Run e2e
-        run: 'yarn nx affected -t e2d --parallel=3'
