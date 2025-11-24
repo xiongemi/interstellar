@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('.eslintrc*') }}
+          key: eslint-${{ hashFiles('**/.eslintrc*') }}
           restore-keys: eslint-
       - name: Cache Jest cache files
         uses: actions/cache@v4
@@ -88,25 +88,25 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - name: Cache eslint cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('.eslintrc*') }}
+          key: eslint-${{ hashFiles('**/.eslintrc*') }}
           restore-keys: eslint-
       - name: Cache Jest cache files
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: '**/.jest/cache'
           key: jest-${{ hashFiles('**/jest.config.js') }}
           restore-keys: jest-
       - name: Cache Next build cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: '**/.next/cache'
           key: next-cache-${{ hashFiles('**/next.config.js') }}
           restore-keys: next-cache-
       - name: Cache Nx computation cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             .nx/cache
