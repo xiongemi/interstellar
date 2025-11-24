@@ -34,12 +34,14 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
-      - name: Cache eslint cache
-        uses: actions/cache@v4
+      - name: Restore eslint cache
+        uses: actions/cache/restore@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*') }}
-          restore-keys: eslint-
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          restore-keys: |
+            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
+            eslint-
       - name: Cache Jest cache files
         uses: actions/cache@v4
         with:
@@ -62,6 +64,29 @@ jobs:
           restore-keys: nx-cache-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
+      - name: Compute eslint cache hash
+        id: eslint-cache-hash-main
+        if: always()
+        run: |
+          python - <<'PY' >>"$GITHUB_OUTPUT"
+          import hashlib
+          from pathlib import Path
+
+          files = sorted(Path('.').rglob('.eslintcache'))
+          if not files:
+              print("hash=")
+          else:
+              digest = hashlib.sha256()
+              for path in files:
+                  digest.update(path.read_bytes())
+              print(f"hash={digest.hexdigest()}")
+          PY
+      - name: Save eslint cache
+        if: steps.eslint-cache-hash-main.outputs.hash != ''
+        uses: actions/cache/save@v4
+        with:
+          path: '**/.eslintcache'
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-${{ steps.eslint-cache-hash-main.outputs.hash }}
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
       - name: Run build
@@ -92,12 +117,14 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
-      - name: Cache eslint cache
+      - name: Restore eslint cache
         uses: actions/cache/restore@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*') }}
-          restore-keys: eslint-
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          restore-keys: |
+            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
+            eslint-
       - name: Cache Jest cache files
         uses: actions/cache/restore@v4
         with:
@@ -119,7 +146,7 @@ jobs:
           key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
           restore-keys: nx-cache-
       - name: Run lint
-        run: 'yarn nx affected -t lint --parallel=3'
+        run: 'yarn nx run-many -t lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3 --changedSince=origin/main'
       - name: Run build
