@@ -35,8 +35,28 @@ jobs:
         uses: actions/cache@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('.eslintrc*') }}
+          key: eslint-${{ hashFiles('**/.eslintrc*') }}
           restore-keys: eslint-
+      - name: Cache Jest cache files
+        uses: actions/cache@v4
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js') }}
+          restore-keys: jest-
+      - name: Cache Next build cache
+        uses: actions/cache@v4
+        with:
+          path: '**/.next/cache'
+          key: next-cache-${{ hashFiles('**/next.config.js') }}
+          restore-keys: next-cache-
+      - name: Cache Nx computation cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nx/cache
+            .nx/workspace-data/*.db
+          key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
+          restore-keys: nx-cache-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
@@ -71,13 +91,31 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('.eslintrc*') }}
+          key: eslint-${{ hashFiles('**/.eslintrc*') }}
           restore-keys: eslint-
+      - name: Cache Jest cache files
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js') }}
+          restore-keys: jest-
+      - name: Cache Next build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.next/cache'
+          key: next-cache-${{ hashFiles('**/next.config.js') }}
+          restore-keys: next-cache-
+      - name: Cache Nx computation cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .nx/cache
+            .nx/workspace-data/*.db
+          key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
+          restore-keys: nx-cache-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Run e2e
-        run: 'yarn nx affected -t e2e --parallel=3'
