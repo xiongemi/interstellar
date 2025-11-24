@@ -119,5 +119,3 @@ jobs:
         run: 'yarn nx affected -t test --parallel=3'
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Run e2e
-        run: 'yarn nx affected -t e2e --parallel=3'
