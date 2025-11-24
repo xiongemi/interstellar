@@ -67,7 +67,9 @@ jobs:
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Run e2e
-        run: 'yarn nx affected -t e2e --parallel=1'
+        uses: cypress-io/github-action@v6
+        with:
+          command: yarn nx affected -t e2e --parallel=1
 
   pr:
     runs-on: ubuntu-latest
