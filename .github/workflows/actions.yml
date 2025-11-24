@@ -29,6 +29,7 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - name: Cache eslint cache
         uses: actions/cache@v4
@@ -64,6 +65,7 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - name: Cache eslint cache
         uses: actions/cache/restore@v4
