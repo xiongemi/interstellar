@@ -39,7 +39,7 @@ jobs:
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Run e2e
-        run: 'yarn nx affected -t e2d --parallel=3'
+        run: 'yarn nx affected -t e2e --parallel=3'
 
   pr:
     runs-on: ubuntu-latest
@@ -68,4 +68,4 @@ jobs:
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Run e2e
-        run: 'yarn nx affected -t e2d --parallel=3'
+        run: 'yarn nx affected -t e2e --parallel=3'
