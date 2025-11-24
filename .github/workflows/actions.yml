@@ -37,6 +37,12 @@ jobs:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('.eslintrc*') }}
           restore-keys: eslint-
+      - name: Cache Jest cache files
+        uses: actions/cache@v4
+        with:
+          path: '**/*.jest'
+          key: jest-${{ hashFiles('**/*.jest') }}
+          restore-keys: jest-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
@@ -68,11 +74,17 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - name: Cache eslint cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('.eslintrc*') }}
           restore-keys: eslint-
+      - name: Cache Jest cache files
+        uses: actions/cache@v4
+        with:
+          path: '**/*.jest'
+          key: jest-${{ hashFiles('**/*.jest') }}
+          restore-keys: jest-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Run test
