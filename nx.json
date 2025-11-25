@@ -36,5 +36,6 @@
     "@nx/jest/plugin",
     "@nx/next/plugin",
     "@nx/js/typescript"
-  ]
+  ],
+  "cache":123
 }
