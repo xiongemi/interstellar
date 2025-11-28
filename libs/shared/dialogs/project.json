@@ -4,25 +4,5 @@
   "sourceRoot": "libs/shared/dialogs/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/rollup:rollup",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/shared/dialogs",
-        "tsConfig": "libs/shared/dialogs/tsconfig.lib.json",
-        "project": "libs/shared/dialogs/package.json",
-        "entryFile": "libs/shared/dialogs/src/index.ts",
-        "external": ["react/jsx-runtime"],
-        "rollupConfig": "@nx/react/plugins/bundle-rollup",
-        "assets": [
-          {
-            "glob": "libs/shared/dialogs/README.md",
-            "input": ".",
-            "output": "."
-          }
-        ]
-      }
-    }
-  }
+  "targets": {}
 }

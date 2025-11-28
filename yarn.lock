@@ -12867,7 +12867,6 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-refresh: "npm:^0.10.0"
-    rollup: "npm:^4.14.0"
     style-loader: "npm:^3.3.0"
     stylus: "npm:^0.55.0"
     stylus-loader: "npm:^7.1.0"
