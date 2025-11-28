@@ -45,7 +45,8 @@ Thumbs.db
 .specstory/
 .yarn/
 .next/
-.tsbuildinfo
-**/.tsbuildinfo
+*.tsbuildinfo
+**/*.tsbuildinfo
 .eslintcache
 .jest/
+

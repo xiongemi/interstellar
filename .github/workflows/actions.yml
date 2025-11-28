@@ -34,14 +34,7 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
-      - name: Restore eslint cache
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-          restore-keys: |
-            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
-            eslint-
+    
       - name: Restore tsconfig build info
         uses: actions/cache/restore@v4
         with:
@@ -50,18 +43,17 @@ jobs:
           restore-keys: |
             tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
             tsconfig-buildinfo-
-      - name: Restore Jest cache files
+
+
+
+      - name: Restore eslint cache
         uses: actions/cache/restore@v4
         with:
-          path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
-          restore-keys: jest-
-      - name: Restore Next build cache
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
-          restore-keys: next-cache-
+              path: '**/.eslintcache'
+              key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+              restore-keys: |
+                eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
+                eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Save eslint cache
@@ -70,30 +62,46 @@ jobs:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
 
+      - name: Restore Jest cache files
+          uses: actions/cache/restore@v4
+          with:
+            path: '**/.jest/cache'
+            key: jest-${{ hashFiles('**/jest.config.js') }}
+            restore-keys: jest-
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
-
       - name: Save Jest cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.jest/cache'
           key: jest-${{ hashFiles('**/jest.config.js') }}
 
+          - name: Restore Next build cache
+          uses: actions/cache/restore@v4
+          with:
+            path: '**/.next/cache'
+            key: next-cache-${{ hashFiles('**/next.config.js') }}
+            restore-keys: next-cache-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
+        - name: Save Next build cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/.next/cache'
+          key: next-cache-${{ hashFiles('**/next.config.js') }}
+
+
       - name: Run typecheck
         run: 'yarn nx run-many --target typecheck --projects="shared-*" --parallel=3'
+
+        
       - name: Save tsconfig build info
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/tsconfig.lib.tsbuildinfo'
           key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
 
-      - name: Save Next build cache
-        uses: ./.github/actions/save-cache-with-hash
-        with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
+
 
       - name: Run e2e
         uses: cypress-io/github-action@v6

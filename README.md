@@ -12,17 +12,24 @@ This repo shows how using Nx Managed Agents you can distribute your CI reducing 
 </a>
 <br>
 
-## Repository
+## Repository Structure
 
-- 5 shared buildable packages/libraries with 250 components each
-- 5 Next.js applications built out of 20 app-specific libraries. Each app-specific lib has 250 components each. Each library uses the shared components.
+This repository is a monorepo built with [Nx](https://nx.dev) to demonstrate the capabilities of Nx Agents for distributed CI. It is structured with a set of applications and shared libraries, simulating a real-world, large-scale project.
+
+The repository contains:
+- **5 Next.js Applications**: These are the main front-end applications of the project, found under the `apps` directory.
+- **5 Cypress Applications**: Each Next.js app has a corresponding end-to-end testing suite under the `apps` directory, built with Cypress.
+- **6 Shared Libraries**: These are located in the `libs` directory and contain shared components and logic used across the different applications.
 
 ## Baseline
 
 The CI for this repo is implemented as follows:
 
-```
-npx nx affected -t export test lint --parallel 1 && npx nx affected -t e2e --parallel 1
+```bash
+yarn nx affected -t lint --parallel=3 && \
+yarn nx affected -t test --parallel=3 && \
+yarn nx affected -t build --parallel=3 && \
+yarn nx affected -t e2e --parallel=1
 ```
 
 The job takes 87 minutes.
@@ -60,6 +67,32 @@ Machine utilization was even:
 <br>
 <img src="readme-resources/utilization.png" alt='diagram showing cipe' width="600">
 <br>
+
+### Advanced Caching Strategy
+
+In addition to distributing tasks, this repository employs an advanced caching strategy for build and test artifacts to further optimize CI performance.
+
+The standard `actions/cache` in GitHub Actions is often used to cache dependencies based on lock files (e.g., `yarn.lock`). While useful, this approach doesn't work well for caching the *outputs* of build, lint, or test runs, as the cache would be invalidated too frequently by source code changes.
+
+To address this, we use a custom caching mechanism that saves caches only when their content has actually changed. This is implemented via a reusable composite action located at `.github/actions/save-cache-with-hash`.
+
+#### How It Works
+
+1.  **Restore Cache**: At the beginning of a job, we restore the caches for `eslint`, `jest`, `next`, and `tsconfig` build info using `actions/cache/restore@v4`.
+2.  **Run Tasks**: The `lint`, `test`, and `build` jobs are executed. These tasks may or may not modify the cached artifacts.
+3.  **Compute Hash and Save**: After the tasks run, our custom `save-cache-with-hash` action computes a hash of the contents of the directories/files to be cached. If this hash is different from what's stored, it means the content has changed, and a new version of the cache is saved.
+
+This is what a step using the composite action looks like in `.github/workflows/actions.yml`:
+
+```yaml
+      - name: Save Jest cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js') }}
+```
+
+This strategy ensures that we are not re-uploading large cache artifacts on every run, saving time and network bandwidth, while still ensuring that subsequent jobs have access to the latest built outputs when they do change.
 
 ## What About Remote Caching?
 
