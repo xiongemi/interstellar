@@ -42,55 +42,59 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
-      - name: Cache Jest cache files
-        uses: actions/cache@v4
+      - name: Restore tsconfig build info
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/tsconfig.lib.tsbuildinfo'
+          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
+          restore-keys: |
+            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
+            tsconfig-buildinfo-
+      - name: Restore Jest cache files
+        uses: actions/cache/restore@v4
         with:
           path: '**/.jest/cache'
           key: jest-${{ hashFiles('**/jest.config.js') }}
           restore-keys: jest-
-      - name: Cache Next build cache
-        uses: actions/cache@v4
+      - name: Restore Next build cache
+        uses: actions/cache/restore@v4
         with:
           path: '**/.next/cache'
           key: next-cache-${{ hashFiles('**/next.config.js') }}
           restore-keys: next-cache-
-      - name: Cache Nx computation cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .nx/cache
-            .nx/workspace-data/*.db
-          key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
-          restore-keys: nx-cache-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
-      - name: Compute eslint cache hash
-        id: eslint-cache-hash-main
-        if: always()
-        run: |
-          python - <<'PY' >>"$GITHUB_OUTPUT"
-          import hashlib
-          from pathlib import Path
-
-          files = sorted(Path('.').rglob('.eslintcache'))
-          if not files:
-              print("hash=")
-          else:
-              digest = hashlib.sha256()
-              for path in files:
-                  digest.update(path.read_bytes())
-              print(f"hash={digest.hexdigest()}")
-          PY
       - name: Save eslint cache
-        if: steps.eslint-cache-hash-main.outputs.hash != ''
-        uses: actions/cache/save@v4
+        uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-${{ steps.eslint-cache-hash-main.outputs.hash }}
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
+
+      - name: Save Jest cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js') }}
+
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
+      - name: Run typecheck
+        run: 'yarn nx run-many --target typecheck --projects="shared-*" --parallel=3'
+      - name: Save tsconfig build info
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/tsconfig.lib.tsbuildinfo'
+          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
+
+      - name: Save Next build cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/.next/cache'
+          key: next-cache-${{ hashFiles('**/next.config.js') }}
+
       - name: Run e2e
         uses: cypress-io/github-action@v6
         with:
@@ -125,6 +129,14 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
+      - name: Restore tsconfig build info
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/tsconfig.lib.tsbuildinfo'
+          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
+          restore-keys: |
+            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
+            tsconfig-buildinfo-
       - name: Cache Jest cache files
         uses: actions/cache/restore@v4
         with:
@@ -146,8 +158,10 @@ jobs:
           key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
           restore-keys: nx-cache-
       - name: Run lint
-        run: 'yarn nx run-many -t lint --parallel=3'
+        run: 'yarn nx run-many --target lint --parallel=3'
       - name: Run test
-        run: 'yarn nx affected -t test --parallel=3 --changedSince=origin/main'
+        run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
+      - name: Run typecheck
+        run: 'yarn nx run-many --target build-lib --projects="shared-*" --parallel=3'
       - name: Run build
-        run: 'yarn nx affected -t build --parallel=3'
+        run: 'yarn nx affected --target build --parallel=3'

@@ -1,0 +1,49 @@
+name: 'Save Cache with Hash'
+description: 'Saves a cache if its contents have changed, using a hash of the contents.'
+inputs:
+  path:
+    description: 'The path/glob pattern of the file(s) or directory(ies) to cache.'
+    required: true
+  key:
+    description: 'The base cache key.'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Compute hash
+      id: compute-hash
+      shell: bash
+      run: |
+        HASH=$(python3 -c "
+        import hashlib
+        import sys
+        from pathlib import Path
+        import glob
+
+        path_glob = '${{ inputs.path }}'
+        digest = hashlib.sha256()
+        has_content = False
+
+        paths = glob.glob(path_glob, recursive=True)
+
+        for p_str in sorted(paths):
+            p = Path(p_str)
+            if p.is_file():
+                digest.update(p.read_bytes())
+                has_content = True
+            elif p.is_dir():
+                for f in sorted(p.rglob('*')):
+                    if f.is_file():
+                        digest.update(f.read_bytes())
+                        has_content = True
+        
+        if has_content:
+            sys.stdout.write(digest.hexdigest())
+        ")
+        echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+    - name: Save cache
+      if: steps.compute-hash.outputs.hash != ''
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}-${{ steps.compute-hash.outputs.hash }}

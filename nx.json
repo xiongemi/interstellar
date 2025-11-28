@@ -28,6 +28,11 @@
         "cache": true,
         "cache-strategy": "content"
       }
+    },
+    "typecheck": {
+      "options": {
+        "args": ["tsconfig.lib.json"]
+      }
     }
   },
   "plugins": [
@@ -35,7 +40,16 @@
     "@nx/eslint/plugin",
     "@nx/jest/plugin",
     "@nx/next/plugin",
-    "@nx/js/typescript"
-  ],
-  "cache":123
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "build": {
+          "targetName": "build-lib",
+          "configName": "tsconfig.lib.json"
+        }
+      },
+      "includes": ["libs/**/*"],
+      "excludes": ["apps/**/*", "apps/*-e2e/**/*"]
+    }
+  ]
 }
