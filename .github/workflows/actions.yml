@@ -100,7 +100,7 @@ jobs:
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Run typecheck
-        run: 'yarn nx affected --target typecheck --projects="shared-*" --parallel=3'
+        run: 'yarn nx run-many --target typecheck --projects="shared-*" --parallel=3'
       - name: Compute tsconfig build info hash
         id: tsconfig-buildinfo-hash-main
         if: always()
@@ -191,6 +191,6 @@ jobs:
       - name: Run test
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
       - name: Run typecheck
-        run: 'yarn nx affected --target build-lib --projects="shared-*" --parallel=3'
+        run: 'yarn nx run-many --target build-lib --projects="shared-*" --parallel=3'
       - name: Run build
         run: 'yarn nx affected --target build --parallel=3'
