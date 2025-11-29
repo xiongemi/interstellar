@@ -1,4 +1,4 @@
-name: ManagedAgentsDemo
+name: CacheDemo
 
 on:
   push:
@@ -34,26 +34,15 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
-    
-      - name: Restore tsconfig build info
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-          restore-keys: |
-            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
-            tsconfig-buildinfo-
-
-
 
       - name: Restore eslint cache
         uses: actions/cache/restore@v4
         with:
-              path: '**/.eslintcache'
-              key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-              restore-keys: |
-                eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
-                eslint-
+          path: '**/.eslintcache'
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          restore-keys: |
+            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
+            eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Save eslint cache
@@ -63,50 +52,44 @@ jobs:
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
 
       - name: Restore Jest cache files
-          uses: actions/cache/restore@v4
-          with:
-            path: '**/.jest/cache'
-            key: jest-${{ hashFiles('**/jest.config.js') }}
-            restore-keys: jest-
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          restore-keys: jest-
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
       - name: Save Jest cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
-          - name: Restore Next build cache
-          uses: actions/cache/restore@v4
-          with:
-            path: '**/.next/cache'
-            key: next-cache-${{ hashFiles('**/next.config.js') }}
-            restore-keys: next-cache-
+      - name: Restore Next build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.next/cache'
+          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          restore-keys: next-cache-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-        - name: Save Next build cache
+      - name: Save Next build cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
+          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
 
-
-      - name: Run typecheck
-        run: 'yarn nx run-many --target typecheck --projects="shared-*" --parallel=3'
-
-        
-      - name: Save tsconfig build info
-        uses: ./.github/actions/save-cache-with-hash
+      - name: Cache Cypress installation
+        uses: actions/cache@v4
         with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-
-
-
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
       - name: Run e2e
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=1
+          command: yarn nx affected -t e2e --parallel=3
 
   pr:
     runs-on: ubuntu-latest
@@ -137,39 +120,39 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
-      - name: Restore tsconfig build info
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-          restore-keys: |
-            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
-            tsconfig-buildinfo-
       - name: Cache Jest cache files
         uses: actions/cache/restore@v4
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
           restore-keys: jest-
       - name: Cache Next build cache
         uses: actions/cache/restore@v4
         with:
           path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
+          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
           restore-keys: next-cache-
-      - name: Cache Nx computation cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            .nx/cache
-            .nx/workspace-data/*.db
-          key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
-          restore-keys: nx-cache-
       - name: Run lint
         run: 'yarn nx run-many --target lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
-      - name: Run typecheck
-        run: 'yarn nx run-many --target build-lib --projects="shared-*" --parallel=3'
       - name: Run build
         run: 'yarn nx affected --target build --parallel=3'
+
+      - name: Cache Cypress installation
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+      - name: Find changed Cypress specs
+        id: find_specs
+        run: echo "specs=$(yarn find-cypress-specs --since origin/main --separator ',')" >> $GITHUB_OUTPUT
+      - name: Run e2e for changed specs
+        if: steps.find_specs.outputs.specs != ''
+        uses: cypress-io/github-action@v6
+        with:
+          command: yarn nx affected -t e2e --parallel=3
+          spec: ${{ steps.find_specs.outputs.specs }}
+
