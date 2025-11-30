@@ -44,7 +44,7 @@ jobs:
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
       - name: Run lint
-        run: 'yarn nx affected -t lint --parallel=3'
+        run: 'yarn nx run-many -t lint --parallel=3'
       - name: Save eslint cache
         uses: ./.github/actions/save-cache-with-hash
         with:
@@ -58,7 +58,7 @@ jobs:
           key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
           restore-keys: jest-
       - name: Run test
-        run: 'yarn nx affected -t test --parallel=3'
+        run: 'yarn nx run-many -t test --parallel=3'
       - name: Save Jest cache
         uses: ./.github/actions/save-cache-with-hash
         with:
@@ -72,7 +72,7 @@ jobs:
           key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
           restore-keys: next-
       - name: Run build
-        run: 'yarn nx affected -t build --parallel=3'
+        run: 'yarn nx run-many -t build --parallel=3'
       - name: Save Next build cache
         uses: ./.github/actions/save-cache-with-hash
         with:
@@ -89,7 +89,7 @@ jobs:
       - name: Run e2e
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=3
+          command: yarn nx run-many -t e2e --parallel=3
 
   pr:
     runs-on: ubuntu-latest
@@ -133,7 +133,7 @@ jobs:
           key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
           restore-keys: next-
       - name: Run lint
-        run: 'yarn nx run-many --target lint --parallel=3'
+        run: 'yarn nx affected --target lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
       - name: Run build
@@ -147,15 +147,4 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
       - name: Run e2e tests for affected projects
-        run: |
-          PROJECTS=$(yarn nx show projects --affected --with-target e2e --json)
-          echo "Affected projects: $PROJECTS"
-          for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
-            echo "Running tests for $PROJECT"
-            SPECS=$(yarn nx find-specs $PROJECT --branch origin/main)
-            if [ -n "$SPECS" ]; then
-              yarn nx e2e $PROJECT --spec "$SPECS"
-            else
-              echo "No specs to run for $PROJECT"
-            fi
-          done
+        run: 'yarn nx affected --target e2e --parallel=3 -- --parallel'

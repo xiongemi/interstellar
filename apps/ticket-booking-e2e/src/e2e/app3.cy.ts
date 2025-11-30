@@ -7,6 +7,8 @@ describe('ticket-booking-e2e (3)', () => {
     // Custom command example, see `../support/commands.ts` file
     cy.login('my-email@something.com', 'myPassword');
 
+    cy.wait(1000); // simulate slow test
+
     // Function helper example, see `../support/app.po.ts` file
     getGreeting().contains(/Welcome/);
   });
@@ -15,6 +17,8 @@ describe('ticket-booking-e2e (3)', () => {
     // Custom command example, see `../support/commands.ts` file
     cy.login('my-email@something.com', 'myPassword');
 
+    cy.wait(1000); // simulate slow test
+
     // Function helper example, see `../support/app.po.ts` file
     getGreeting().contains(/Welcome/);
   });
@@ -22,6 +26,8 @@ describe('ticket-booking-e2e (3)', () => {
   it('should display welcome message (third)', () => {
     // Custom command example, see `../support/commands.ts` file
     cy.login('my-email@something.com', 'myPassword');
+
+    cy.wait(1000); // simulate slow test
 
     // Function helper example, see `../support/app.po.ts` file
     getGreeting().contains(/Welcome/);
