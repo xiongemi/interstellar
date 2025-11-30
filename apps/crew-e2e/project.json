@@ -3,6 +3,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/crew-e2e",
   "projectType": "application",
-  "targets": {},
+  "targets": {
+    "find-specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "find-cypress-specs",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
   "tags": ["e2e"]
 }

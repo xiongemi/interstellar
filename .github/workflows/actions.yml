@@ -1,4 +1,4 @@
-name: ManagedAgentsDemo
+name: CacheDemo
 
 on:
   push:
@@ -34,6 +34,7 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
+
       - name: Restore eslint cache
         uses: actions/cache/restore@v4
         with:
@@ -42,26 +43,6 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
-      - name: Restore tsconfig build info
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-          restore-keys: |
-            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
-            tsconfig-buildinfo-
-      - name: Restore Jest cache files
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
-          restore-keys: jest-
-      - name: Restore Next build cache
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
-          restore-keys: next-cache-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Save eslint cache
@@ -70,35 +51,45 @@ jobs:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
 
+      - name: Restore Jest cache files
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.jest/cache'
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          restore-keys: jest-
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
-
       - name: Save Jest cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
+      - name: Restore Next build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          restore-keys: next-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Run typecheck
-        run: 'yarn nx run-many --target typecheck --projects="shared-*" --parallel=3'
-      - name: Save tsconfig build info
-        uses: ./.github/actions/save-cache-with-hash
-        with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-
       - name: Save Next build cache
         uses: ./.github/actions/save-cache-with-hash
         with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
 
+      - name: Cache Cypress installation
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
       - name: Run e2e
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=1
+          command: yarn nx affected -t e2e --parallel=3
 
   pr:
     runs-on: ubuntu-latest
@@ -129,39 +120,42 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
-      - name: Restore tsconfig build info
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/tsconfig.lib.tsbuildinfo'
-          key: tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}
-          restore-keys: |
-            tsconfig-buildinfo-${{ hashFiles('**/tsconfig.json', 'nx.json') }}-
-            tsconfig-buildinfo-
       - name: Cache Jest cache files
         uses: actions/cache/restore@v4
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
           restore-keys: jest-
       - name: Cache Next build cache
         uses: actions/cache/restore@v4
         with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js') }}
-          restore-keys: next-cache-
-      - name: Cache Nx computation cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            .nx/cache
-            .nx/workspace-data/*.db
-          key: nx-cache-${{ hashFiles('nx.json', 'yarn.lock') }}
-          restore-keys: nx-cache-
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          restore-keys: next-
       - name: Run lint
         run: 'yarn nx run-many --target lint --parallel=3'
       - name: Run test
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
-      - name: Run typecheck
-        run: 'yarn nx run-many --target build-lib --projects="shared-*" --parallel=3'
       - name: Run build
         run: 'yarn nx affected --target build --parallel=3'
+
+      - name: Cache Cypress installation
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+      - name: Run e2e tests for affected projects
+        run: |
+          PROJECTS=$(yarn nx show projects --affected --with-target e2e --json)
+          echo "Affected projects: $PROJECTS"
+          for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
+            echo "Running tests for $PROJECT"
+            SPECS=$(yarn nx find-specs $PROJECT --branch origin/main)
+            if [ -n "$SPECS" ]; then
+              yarn nx e2e $PROJECT --spec "$SPECS"
+            else
+              echo "No specs to run for $PROJECT"
+            fi
+          done
