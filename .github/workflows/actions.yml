@@ -155,4 +155,3 @@ jobs:
         with:
           command: yarn nx affected -t e2e --parallel=3
           spec: ${{ steps.find_specs.outputs.specs }}
-

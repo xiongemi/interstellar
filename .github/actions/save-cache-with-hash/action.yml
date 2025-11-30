@@ -8,7 +8,7 @@ inputs:
     description: 'The base cache key.'
     required: true
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Compute hash
       id: compute-hash
@@ -36,7 +36,7 @@ runs:
                     if f.is_file():
                         digest.update(f.read_bytes())
                         has_content = True
-        
+
         if has_content:
             sys.stdout.write(digest.hexdigest())
         ")
