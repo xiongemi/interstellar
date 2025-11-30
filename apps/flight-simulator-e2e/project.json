@@ -3,14 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/flight-simulator-e2e",
   "projectType": "application",
-  "targets": {
-    "find-specs": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "find-cypress-specs",
-        "cwd": "{projectRoot}"
-      }
-    }
-  },
+  "targets": {},
   "tags": ["e2e"]
 }

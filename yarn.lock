@@ -12180,28 +12180,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-cypress-specs@npm:^1.54.8":
-  version: 1.54.8
-  resolution: "find-cypress-specs@npm:1.54.8"
-  dependencies:
-    "@actions/core": "npm:^1.10.0"
-    arg: "npm:^5.0.1"
-    console.table: "npm:^0.10.0"
-    debug: "npm:^4.3.3"
-    find-test-names: "npm:1.29.19"
-    minimatch: "npm:^5.1.4"
-    pluralize: "npm:^8.0.0"
-    require-and-forget: "npm:^1.0.1"
-    shelljs: "npm:^0.10.0"
-    spec-change: "npm:^1.11.17"
-    tinyglobby: "npm:^0.2.15"
-    tsx: "npm:^4.19.3"
-  bin:
-    find-cypress-specs: bin/find.js
-  checksum: 10c0/6f49b72ace7dddc74f219d96f16c7c0c02f08262aa21ac8564b0ba65687855a8b552cbb79151b6b29cba5ec9c1efd5e58b7745b3e5583ebcabd806dfe7f3cec6
-  languageName: node
-  linkType: hard
-
 "find-file-up@npm:^2.0.1":
   version: 2.0.1
   resolution: "find-file-up@npm:2.0.1"
@@ -13582,7 +13560,6 @@ __metadata:
     eslint-plugin-react: "npm:7.32.2"
     eslint-plugin-react-hooks: "npm:5.0.0"
     file-loader: "npm:^6.2.0"
-    find-cypress-specs: "npm:^1.54.8"
     jest: "npm:30.0.5"
     jest-environment-jsdom: "npm:30.0.5"
     jest-util: "npm:30.0.5"

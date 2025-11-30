@@ -147,18 +147,4 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
       - name: Run e2e tests for affected projects
-        run: |
-          PROJECTS=$(yarn nx show projects --with-target e2e --json)
-          echo "Affected projects: $PROJECTS"
-          for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
-            echo "Finding specs for $PROJECT"
-            SPECS_RAW=$(yarn nx find-specs "$PROJECT" --branch origin/main || true)
-            SPECS=$(echo "$SPECS_RAW" | grep -E '\.cy\.[jt]sx?$' || true)
-            if [ -z "$SPECS" ]; then
-              echo "No specs to run for $PROJECT"
-              continue
-            fi
-            SPECS_CSV=$(echo "$SPECS" | paste -sd, -)
-            echo "Running specs for $PROJECT: $SPECS_CSV"
-            yarn nx e2e "$PROJECT" --spec "$SPECS_CSV"
-          done
+        run: 'yarn nx affected --target e2e --parallel=3 -- --parallel'
