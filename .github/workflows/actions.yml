@@ -68,16 +68,16 @@ jobs:
       - name: Restore Next build cache
         uses: actions/cache/restore@v4
         with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
-          restore-keys: next-cache-
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          restore-keys: next-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Save Next build cache
         uses: ./.github/actions/save-cache-with-hash
         with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
 
       - name: Cache Cypress installation
         uses: actions/cache@v4
@@ -129,9 +129,9 @@ jobs:
       - name: Cache Next build cache
         uses: actions/cache/restore@v4
         with:
-          path: '**/.next/cache'
-          key: next-cache-${{ hashFiles('**/next.config.js', 'nx.json') }}
-          restore-keys: next-cache-
+          path: '**/.next'
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          restore-keys: next-
       - name: Run lint
         run: 'yarn nx run-many --target lint --parallel=3'
       - name: Run test
@@ -146,12 +146,16 @@ jobs:
           key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             cypress-${{ runner.os }}-
-      - name: Find changed Cypress specs
-        id: find_specs
-        run: echo "specs=$(yarn find-cypress-specs --since origin/main --separator ',')" >> $GITHUB_OUTPUT
-      - name: Run e2e for changed specs
-        if: steps.find_specs.outputs.specs != ''
-        uses: cypress-io/github-action@v6
-        with:
-          command: yarn nx affected -t e2e --parallel=3
-          spec: ${{ steps.find_specs.outputs.specs }}
+      - name: Run e2e tests for affected projects
+        run: |
+          PROJECTS=$(yarn nx show projects --affected --with-target e2e --json)
+          echo "Affected projects: $PROJECTS"
+          for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
+            echo "Running tests for $PROJECT"
+            SPECS=$(yarn nx find-specs $PROJECT --branch origin/main)
+            if [ -n "$SPECS" ]; then
+              yarn nx e2e $PROJECT --spec "$SPECS"
+            else
+              echo "No specs to run for $PROJECT"
+            fi
+          done
