@@ -148,7 +148,7 @@ jobs:
             cypress-${{ runner.os }}-
       - name: Run e2e tests for affected projects
         run: |
-          PROJECTS=$(yarn nx show projects --affected --with-target e2e --json)
+          PROJECTS=$(yarn nx show projects --with-target e2e --json)
           echo "Affected projects: $PROJECTS"
           for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
             echo "Finding specs for $PROJECT"
