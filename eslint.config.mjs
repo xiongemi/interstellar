@@ -3,6 +3,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import js from '@eslint/js';
 import nxEslintPlugin from '@nx/eslint-plugin';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 
 const compat = new FlatCompat({
   baseDirectory: dirname(fileURLToPath(import.meta.url)),
@@ -19,7 +20,7 @@ export default [
       '**/.nx/cache',
     ],
   },
-  { plugins: { '@nx': nxEslintPlugin } },
+  { plugins: { '@nx': nxEslintPlugin, 'jsx-a11y': jsxA11yPlugin } },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
@@ -75,4 +76,10 @@ export default [
         ...config.rules,
       },
     })),
+  {
+    files: ['**/*.tsx', '**/*.jsx'],
+    rules: {
+      ...jsxA11yPlugin.configs.recommended.rules,
+    },
+  },
 ];
