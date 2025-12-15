@@ -51,6 +51,13 @@ jobs:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
 
+      - name: Restore TypeScript build info
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/*.tsbuildinfo'
+          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json') }}
+          restore-keys: tsbuildinfo-
+
       - name: Restore Jest cache files
         uses: actions/cache/restore@v4
         with:
@@ -71,6 +78,12 @@ jobs:
           path: '**/.next'
           key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
           restore-keys: next-
+      - name: Restore dist/out-tsc cache
+        uses: actions/cache/restore@v4
+        with:
+          path: dist/out-tsc
+          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json') }}
+          restore-keys: out-tsc-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Save Next build cache
@@ -93,6 +106,16 @@ jobs:
 
       - name: Run typecheck
         run: 'yarn nx run-many -t typecheck --projects="shared-*" --parallel=3'
+      - name: Save dist/out-tsc cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: dist/out-tsc
+          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json') }}
+      - name: Save TypeScript build info cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/*.tsbuildinfo'
+          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json') }}
 
   pr:
     runs-on: ubuntu-latest
