@@ -49,8 +49,8 @@
           "configName": "tsconfig.lib.json"
         }
       },
-      "includes": ["libs/**/*"],
-      "excludes": ["apps/**/*", "apps/*-e2e/**/*"]
+      "include": ["libs/**/*"],
+      "exclude": ["apps/**/*", "apps/*-e2e/**/*"]
     }
   ]
 }
