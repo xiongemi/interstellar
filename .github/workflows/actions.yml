@@ -24,11 +24,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - name: Enable Corepack (Yarn 4)
         run: corepack enable
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
@@ -36,12 +36,11 @@ jobs:
       - run: yarn install --frozen-lockfile
 
       - name: Restore eslint cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v5
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: |
-            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
             eslint-
       - name: Run lint
         run: 'yarn nx affected -t lint --parallel=3'
@@ -49,51 +48,64 @@ jobs:
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-
-      - name: Restore TypeScript build info
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: tsbuildinfo-
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
       - name: Restore Jest cache files
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
-          restore-keys: jest-
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+          restore-keys: |
+            jest-
       - name: Run test
         run: 'yarn nx affected -t test --parallel=3'
-      - name: Save Jest cache
+      - name: Save jest cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
       - name: Restore Next build cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v5
         with:
           path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: next-
-      - name: Restore dist/out-tsc cache
-        uses: actions/cache/restore@v4
-        with:
-          path: dist/out-tsc
-          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json') }}
-          restore-keys: out-tsc-
       - name: Run build
         run: 'yarn nx affected -t build --parallel=3'
       - name: Save Next build cache
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+
+      - name: Restore TypeScript build info
+        uses: actions/cache@v5
+        with:
+          path: '**/*.tsbuildinfo'
+          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+          restore-keys: tsbuildinfo-
+      - name: Restore dist/out-tsc cache
+        uses: actions/cache@v5
+        with:
+          path: dist/out-tsc
+          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+          restore-keys: out-tsc-
+      - name: Run typecheck
+        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
+      - name: Save dist/out-tsc cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: dist/out-tsc
+          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+      - name: Save TypeScript build info cache
+        uses: ./.github/actions/save-cache-with-hash
+        with:
+          path: '**/*.tsbuildinfo'
+          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
       - name: Cache Cypress installation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/Cypress
           key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
@@ -103,19 +115,6 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           command: yarn nx affected -t e2e --parallel=3
-
-      - name: Run typecheck
-        run: 'yarn nx run-many -t typecheck --projects="shared-*" --parallel=3'
-      - name: Save dist/out-tsc cache
-        uses: ./.github/actions/save-cache-with-hash
-        with:
-          path: dist/out-tsc
-          key: out-tsc-${{ hashFiles('tsconfig*.json', 'package.json', 'nx.json') }}
-      - name: Save TypeScript build info cache
-        uses: ./.github/actions/save-cache-with-hash
-        with:
-          path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json') }}
 
   pr:
     runs-on: ubuntu-latest
@@ -132,7 +131,7 @@ jobs:
       - name: Enable Corepack (Yarn 4)
         run: corepack enable
       - name: Restore node_modules cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('yarn.lock') }}
@@ -140,36 +139,34 @@ jobs:
       - run: yarn install --frozen-lockfile
 
       - name: Restore eslint cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-          restore-keys: |
-            eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}-
-            eslint-
+          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+          restore-keys: eslint-
       - name: Run lint
-        run: 'yarn nx run-many --target lint --parallel=3'
+        run: 'yarn nx affected --target lint --parallel=3'
 
       - name: Cache Jest cache files
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: jest-
       - name: Run test
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
 
       - name: Cache Next build cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
+          key: next-${{ hashFiles('**/next.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: next-
       - name: Run build
         run: 'yarn nx affected --target build --parallel=3'
 
       - name: Cache Cypress installation
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/Cypress
           key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
