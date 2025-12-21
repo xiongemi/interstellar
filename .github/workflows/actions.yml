@@ -35,7 +35,15 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Restore eslint cache
+      - name: Count affected projects with lint target
+        id: count-lint
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: lint
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
+      - name: Restore eslint cache files
+        if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: '**/.eslintcache'
@@ -43,14 +51,24 @@ jobs:
           restore-keys: |
             eslint-
       - name: Run lint
+        if: steps.count-lint.outputs.count > 0
         run: 'yarn nx affected -t lint --parallel=3'
       - name: Save eslint cache
+        if: steps.count-lint.outputs.count > 0
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
+      - name: Count affected projects with test target
+        id: count-test
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: test
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
+        if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
@@ -58,22 +76,34 @@ jobs:
           restore-keys: |
             jest-
       - name: Run test
+        if: steps.count-test.outputs.count > 0
         run: 'yarn nx affected -t test --parallel=3'
       - name: Save jest cache
+        if: steps.count-test.outputs.count > 0
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.jest/cache'
           key: jest-${{ hashFiles('**/jest.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
+      - name: Count affected projects with build target
+        id: count-build
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: build
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Next build cache
+        if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: '**/.next'
           key: next-${{ hashFiles('**/next.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: next-
       - name: Run build
+        if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected -t build --parallel=3'
       - name: Save Next build cache
+        if: steps.count-build.outputs.count > 0
         uses: ./.github/actions/save-cache-with-hash
         with:
           path: '**/.next'
@@ -104,7 +134,15 @@ jobs:
           path: '**/*.tsbuildinfo'
           key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
 
+      - name: Count affected projects with e2e target
+        id: count-e2e
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: e2e
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Cache Cypress installation
+        if: steps.count-e2e.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: ~/.cache/Cypress
@@ -112,6 +150,7 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
       - name: Run e2e
+        if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
         with:
           command: yarn nx affected -t e2e --parallel=3
@@ -130,7 +169,7 @@ jobs:
           node-version: '22'
       - name: Enable Corepack (Yarn 4)
         run: corepack enable
-      - name: Restore node_modules cache
+      - name: Restore node_modules cache files
         uses: actions/cache@v5
         with:
           path: node_modules
@@ -138,34 +177,61 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Restore eslint cache
-        uses: actions/cache/restore@v5
+      - name: Count affected projects with lint target
+        id: count-lint
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: lint
+      - name: Restore eslint cache files
+        if: steps.count-lint.outputs.count > 0
+        uses: actions/cache@v5
         with:
           path: '**/.eslintcache'
           key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: eslint-
       - name: Run lint
+        if: steps.count-lint.outputs.count > 0
         run: 'yarn nx affected --target lint --parallel=3'
 
-      - name: Cache Jest cache files
-        uses: actions/cache/restore@v5
+      - name: Count affected projects with test target
+        id: count-test
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: test
+      - name: Restore Jest cache files
+        if: steps.count-test.outputs.count > 0
+        uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
           key: jest-${{ hashFiles('**/jest.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: jest-
       - name: Run test
+        if: steps.count-test.outputs.count > 0
         run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
 
-      - name: Cache Next build cache
-        uses: actions/cache/restore@v5
+      - name: Count affected projects with build target
+        id: count-build
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: build
+      - name: Restore Next build cache files
+        if: steps.count-build.outputs.count > 0
+        uses: actions/cache@v5
         with:
           path: '**/.next'
           key: next-${{ hashFiles('**/next.config.js', 'nx.json', '**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
           restore-keys: next-
       - name: Run build
+        if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected --target build --parallel=3'
 
+      - name: Count affected projects with e2e target
+        id: count-e2e
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: e2e
       - name: Cache Cypress installation
+        if: steps.count-e2e.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: ~/.cache/Cypress
@@ -173,6 +239,7 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
       - name: Run e2e
+        if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
         with:
           command: yarn nx affected -t e2e --parallel=3
