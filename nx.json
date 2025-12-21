@@ -27,8 +27,7 @@
     "lint": {
       "options": {
         "cache": true,
-        "cache-strategy": "content",
-        "concurrency": "auto"
+        "cache-strategy": "content"
       }
     },
     "typecheck": {
