@@ -92,22 +92,9 @@ jobs:
           target: build
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
-      - name: Restore Next build cache
-        if: steps.count-build.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
-          restore-keys: next-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected -t build --parallel=3'
-      - name: Save Next build cache
-        if: steps.count-build.outputs.count > 0
-        uses: ./.github/actions/save-cache-with-hash
-        with:
-          path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
 
       - name: Count affected projects with e2e target
         id: count-e2e
@@ -224,13 +211,6 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: build
-      - name: Restore Next build cache files
-        if: steps.count-build.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/.next'
-          key: next-${{ hashFiles('**/next.config.js', 'nx.json') }}
-          restore-keys: next-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected --target build --parallel=3'
