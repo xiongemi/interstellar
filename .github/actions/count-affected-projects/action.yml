@@ -1,0 +1,30 @@
+name: 'Count Affected Projects'
+description: 'Counts the number of affected projects with a specific target.'
+inputs:
+  target:
+    description: 'The target name to check (e.g., build, test, lint, e2e).'
+    required: true
+  base:
+    description: 'Base commit for affected calculation (optional).'
+    required: false
+  head:
+    description: 'Head commit for affected calculation (optional).'
+    required: false
+outputs:
+  count:
+    description: 'The number of affected projects with the specified target.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Count affected projects
+      id: count
+      shell: bash
+      run: |
+        BASE_ARGS=""
+        if [ -n "${{ inputs.base }}" ] && [ -n "${{ inputs.head }}" ]; then
+          BASE_ARGS="--base=${{ inputs.base }} --head=${{ inputs.head }}"
+        fi
+        COUNT=$(yarn nx show projects --affected --withTarget ${{ inputs.target }} $BASE_ARGS 2>/dev/null | wc -l || echo "0")
+        echo "count=$COUNT" >> $GITHUB_OUTPUT
+        echo "Found $COUNT affected projects with ${{ inputs.target }} target"
+
