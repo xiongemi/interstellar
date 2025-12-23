@@ -16,20 +16,6 @@
     ]
   },
   "targetDefaults": {
-    "test": {
-      "options": {
-        "passWithNoTests": true,
-        "cache": true,
-        "maxWorkers": "50%",
-        "cacheDirectory": ".jest/cache"
-      }
-    },
-    "lint": {
-      "options": {
-        "cache": true,
-        "cache-strategy": "content"
-      }
-    },
     "typecheck": {
       "options": {
         "args": ["tsconfig.lib.json"]
