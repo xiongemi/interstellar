@@ -173,86 +173,15 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
-
-      - name: Count affected projects with lint target
-        id: count-lint
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: lint
-      - name: Restore eslint cache files
-        if: steps.count-lint.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/.eslintcache'
-          key: eslint-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-          restore-keys: eslint-
       - name: Run lint
-        if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected --target lint --parallel=3'
-
-      - name: Count affected projects with test target
-        id: count-test
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: test
-      - name: Restore Jest cache files
-        if: steps.count-test.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/.jest/cache'
-          key: jest-${{ hashFiles('**/jest.config.js', 'nx.json') }}
-          restore-keys: jest-
+        run: 'yarn nx run-many --target lint --parallel=3'
       - name: Run test
-        if: steps.count-test.outputs.count > 0
-        run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
-
-      - name: Count affected projects with build target
-        id: count-build
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: build
+        run: 'yarn nx run-many --target test --parallel=3'
       - name: Run build
-        if: steps.count-build.outputs.count > 0
-        run: 'yarn nx affected --target build --parallel=3'
-
-      - name: Count affected projects with e2e target
-        id: count-e2e
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: e2e
-      - name: Cache Cypress installation
-        if: steps.count-e2e.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
+        run: 'yarn nx run-many --target build --parallel=3'
       - name: Run e2e
-        if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=3
-
-      - name: Count affected projects with typecheck target
-        id: count-typecheck
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: typecheck
-      - name: Restore TypeScript build info
-        if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: tsbuildinfo-
-      - name: Restore dist/out-tsc cache
-        if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: dist/out-tsc
-          key: out-tsc-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: out-tsc-
+          command: 'yarn nx run-many --target e2e --parallel=3'
       - name: Run typecheck
-        if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx affected -t typecheck --parallel=3'
+        run: 'yarn nx run-many --target typecheck --parallel=3'
