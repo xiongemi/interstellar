@@ -2,7 +2,19 @@ module.exports = {
   displayName: 'warp-drive-manager-important-feature-19',
   preset: '../../../jest.preset.js',
   transform: {
-    '^.+\\.[tj]sx?$': 'babel-jest',
+    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
+    '^.+\\.[tj]sx?$': [
+      '@swc/jest',
+      {
+        jsc: {
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
+        },
+      },
+    ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory:
