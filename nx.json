@@ -30,9 +30,14 @@
         "cache-strategy": "content"
       }
     },
+    "build-lib": {
+      "options": {
+        "args": ["--verbose"]
+      }
+    },
     "typecheck": {
       "options": {
-        "args": ["tsconfig.lib.json"]
+        "args": ["tsconfig.lib.json", "--verbose"]
       }
     }
   },

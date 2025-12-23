@@ -14,5 +14,67 @@
     "incremental": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-9"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-8"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-7"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-6"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-5"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-4"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-3"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-2"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-19"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-18"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-17"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-16"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-15"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-14"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-13"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-12"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-11"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-10"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-1"
+    },
+    {
+      "path": "../../libs/warp-drive-manager/important-feature-0"
+    }
+  ]
 }

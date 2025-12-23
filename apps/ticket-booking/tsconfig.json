@@ -14,5 +14,67 @@
     "incremental": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "../../libs/ticket-booking/important-feature-9"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-8"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-7"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-6"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-5"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-4"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-3"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-2"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-19"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-18"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-17"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-16"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-15"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-14"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-13"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-12"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-11"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-10"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-1"
+    },
+    {
+      "path": "../../libs/ticket-booking/important-feature-0"
+    }
+  ]
 }

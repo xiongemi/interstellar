@@ -18,6 +18,9 @@
       "path": "../../shared/icons/tsconfig.lib.json"
     },
     {
+      "path": "../../shared/dialogs/tsconfig.lib.json"
+    },
+    {
       "path": "../../shared/alerts/tsconfig.lib.json"
     },
     {
