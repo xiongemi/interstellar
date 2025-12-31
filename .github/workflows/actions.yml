@@ -255,4 +255,4 @@ jobs:
           restore-keys: out-tsc-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx affected -t typecheck --parallel=3'
+        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
