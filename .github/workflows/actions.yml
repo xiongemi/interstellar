@@ -193,7 +193,7 @@ jobs:
             jest-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'yarn nx affected --target test --parallel=3 --changedSince=origin/main'
+        run: 'yarn nx run-many --target test --parallel=3'
 
       - name: Count affected projects with build target
         id: count-build
