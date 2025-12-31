@@ -14,5 +14,67 @@
     "incremental": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "../../libs/crew/important-feature-9"
+    },
+    {
+      "path": "../../libs/crew/important-feature-8"
+    },
+    {
+      "path": "../../libs/crew/important-feature-7"
+    },
+    {
+      "path": "../../libs/crew/important-feature-6"
+    },
+    {
+      "path": "../../libs/crew/important-feature-5"
+    },
+    {
+      "path": "../../libs/crew/important-feature-4"
+    },
+    {
+      "path": "../../libs/crew/important-feature-3"
+    },
+    {
+      "path": "../../libs/crew/important-feature-2"
+    },
+    {
+      "path": "../../libs/crew/important-feature-19"
+    },
+    {
+      "path": "../../libs/crew/important-feature-18"
+    },
+    {
+      "path": "../../libs/crew/important-feature-17"
+    },
+    {
+      "path": "../../libs/crew/important-feature-16"
+    },
+    {
+      "path": "../../libs/crew/important-feature-15"
+    },
+    {
+      "path": "../../libs/crew/important-feature-14"
+    },
+    {
+      "path": "../../libs/crew/important-feature-13"
+    },
+    {
+      "path": "../../libs/crew/important-feature-12"
+    },
+    {
+      "path": "../../libs/crew/important-feature-11"
+    },
+    {
+      "path": "../../libs/crew/important-feature-10"
+    },
+    {
+      "path": "../../libs/crew/important-feature-1"
+    },
+    {
+      "path": "../../libs/crew/important-feature-0"
+    }
+  ]
 }

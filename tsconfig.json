@@ -1,5 +1,351 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./libs/warp-drive-manager/important-feature-10"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-11"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-12"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-13"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-14"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-15"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-16"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-17"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-18"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-19"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-0"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-1"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-2"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-3"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-4"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-5"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-6"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-7"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-8"
+    },
+    {
+      "path": "./libs/warp-drive-manager/important-feature-9"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-10"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-11"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-12"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-13"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-14"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-15"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-16"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-17"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-18"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-19"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-0"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-1"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-2"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-3"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-4"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-5"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-6"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-7"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-8"
+    },
+    {
+      "path": "./libs/flight-simulator/important-feature-9"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-10"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-11"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-12"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-13"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-14"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-15"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-16"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-17"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-18"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-19"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-0"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-1"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-2"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-3"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-4"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-5"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-6"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-7"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-8"
+    },
+    {
+      "path": "./libs/ticket-booking/important-feature-9"
+    },
+    {
+      "path": "./libs/navigation/important-feature-10"
+    },
+    {
+      "path": "./libs/navigation/important-feature-11"
+    },
+    {
+      "path": "./libs/navigation/important-feature-12"
+    },
+    {
+      "path": "./libs/navigation/important-feature-13"
+    },
+    {
+      "path": "./libs/navigation/important-feature-14"
+    },
+    {
+      "path": "./libs/navigation/important-feature-15"
+    },
+    {
+      "path": "./libs/navigation/important-feature-16"
+    },
+    {
+      "path": "./libs/navigation/important-feature-17"
+    },
+    {
+      "path": "./libs/navigation/important-feature-18"
+    },
+    {
+      "path": "./libs/navigation/important-feature-19"
+    },
+    {
+      "path": "./libs/navigation/important-feature-0"
+    },
+    {
+      "path": "./libs/navigation/important-feature-1"
+    },
+    {
+      "path": "./libs/navigation/important-feature-2"
+    },
+    {
+      "path": "./libs/navigation/important-feature-3"
+    },
+    {
+      "path": "./libs/navigation/important-feature-4"
+    },
+    {
+      "path": "./libs/navigation/important-feature-5"
+    },
+    {
+      "path": "./libs/navigation/important-feature-6"
+    },
+    {
+      "path": "./libs/navigation/important-feature-7"
+    },
+    {
+      "path": "./libs/navigation/important-feature-8"
+    },
+    {
+      "path": "./libs/navigation/important-feature-9"
+    },
+    {
+      "path": "./libs/crew/important-feature-10"
+    },
+    {
+      "path": "./libs/crew/important-feature-11"
+    },
+    {
+      "path": "./libs/crew/important-feature-12"
+    },
+    {
+      "path": "./libs/crew/important-feature-13"
+    },
+    {
+      "path": "./libs/crew/important-feature-14"
+    },
+    {
+      "path": "./libs/crew/important-feature-15"
+    },
+    {
+      "path": "./libs/crew/important-feature-16"
+    },
+    {
+      "path": "./libs/crew/important-feature-17"
+    },
+    {
+      "path": "./libs/crew/important-feature-18"
+    },
+    {
+      "path": "./libs/crew/important-feature-19"
+    },
+    {
+      "path": "./libs/crew/important-feature-0"
+    },
+    {
+      "path": "./libs/crew/important-feature-1"
+    },
+    {
+      "path": "./libs/crew/important-feature-2"
+    },
+    {
+      "path": "./libs/crew/important-feature-3"
+    },
+    {
+      "path": "./libs/crew/important-feature-4"
+    },
+    {
+      "path": "./libs/crew/important-feature-5"
+    },
+    {
+      "path": "./libs/crew/important-feature-6"
+    },
+    {
+      "path": "./libs/crew/important-feature-7"
+    },
+    {
+      "path": "./libs/crew/important-feature-8"
+    },
+    {
+      "path": "./libs/crew/important-feature-9"
+    },
+    {
+      "path": "./apps/warp-drive-manager-e2e"
+    },
+    {
+      "path": "./apps/flight-simulator-e2e"
+    },
+    {
+      "path": "./apps/ticket-booking-e2e"
+    },
+    {
+      "path": "./apps/warp-drive-manager"
+    },
+    {
+      "path": "./libs/shared/components"
+    },
+    {
+      "path": "./apps/flight-simulator"
+    },
+    {
+      "path": "./apps/navigation-e2e"
+    },
+    {
+      "path": "./libs/shared/buttons"
+    },
+    {
+      "path": "./libs/shared/dialogs"
+    },
+    {
+      "path": "./apps/ticket-booking"
+    },
+    {
+      "path": "./libs/shared/alerts"
+    },
+    {
+      "path": "./libs/shared/icons"
+    },
+    {
+      "path": "./apps/navigation"
+    },
+    {
+      "path": "./apps/crew-e2e"
+    },
+    {
+      "path": "./apps/crew"
+    }
+  ]
 }
