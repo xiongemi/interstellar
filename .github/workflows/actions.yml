@@ -108,7 +108,7 @@ jobs:
         if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=3
+          command: yarn nx affected -t e2e --parallel=1
 
       - name: Count affected projects with typecheck target
         id: count-typecheck
@@ -221,7 +221,7 @@ jobs:
         if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
         with:
-          command: yarn nx affected -t e2e --parallel=3
+          command: yarn nx affected -t e2e --parallel=1
 
       - name: Count affected projects with typecheck target
         id: count-typecheck
