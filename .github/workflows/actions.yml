@@ -170,7 +170,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/.eslintcache'
-          key: eslint-full-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          key: eslint-${{ github.event.pull_request.number }}
           restore-keys: |
             eslint-full-
             eslint-
@@ -188,7 +188,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-${{ github.event.pull_request.number }}
           restore-keys: |
             jest-full-
             jest-
@@ -235,7 +235,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
+          key: tsbuildinfo-${{ github.event.pull_request.number }}
           restore-keys: |
             tsbuildinfo-full-
             tsbuildinfo-
@@ -244,7 +244,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: dist/out-tsc
-          key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
+          key: out-tsc-${{ github.event.pull_request.number }}
           restore-keys: |
             out-tsc-full-
             out-tsc-
