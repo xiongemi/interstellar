@@ -20,7 +20,6 @@
       "options": {
         "passWithNoTests": true,
         "cache": true,
-        "maxWorkers": "50%",
         "cacheDirectory": ".jest/cache"
       }
     },
