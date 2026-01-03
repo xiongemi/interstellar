@@ -56,7 +56,7 @@ jobs:
             eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected -t lint --parallel=3'
+        run: 'yarn nx affected -t lint --parallel=3 --configuration=ci'
       - name: Save eslint cache
         if: steps.count-lint.outputs.count > 0
         uses: actions/cache/save@v5
@@ -189,7 +189,7 @@ jobs:
             eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected --target lint --parallel=3'
+        run: 'yarn nx affected --target lint --parallel=3 --configuration=ci'
       - name: Save eslint cache
         if: steps.count-lint.outputs.count > 0
         uses: actions/cache/save@v5
@@ -299,24 +299,14 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Restore eslint cache files
-        uses: actions/cache@v5
-        with:
-          path: ~/.eslint
-          key: eslint-nightly-run-${{ github.run_id }}
       - name: Run lint for all projects
-        run: 'yarn nx run-many -t lint --all --parallel=3'
+        run: 'yarn nx run-many -t lint --all --parallel=3 --configuration=ci'
       - name: Save eslint cache
         uses: actions/cache/save@v5
         with:
           path: ~/.eslint
           key: eslint-full-${{ hashFiles('nx.json') }}
 
-      - name: Restore Jest cache files
-        uses: actions/cache@v5
-        with:
-          path: '**/.jest/cache'
-          key: jest-nightly-run-${{ github.run_id }}
       - name: Run test for all projects
         run: 'yarn nx run-many -t test --all --parallel=3'
       - name: Save jest cache
