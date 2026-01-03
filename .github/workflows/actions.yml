@@ -47,12 +47,11 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore eslint cache files
         if: steps.count-lint.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: ~/.eslint
           key: eslint-main-${{ github.sha }}
           restore-keys: |
-            eslint-main-
             eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
@@ -67,12 +66,11 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
         if: steps.count-test.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: '**/.jest/cache'
           key: jest-main-${{ github.sha }}
           restore-keys: |
-            jest-main-
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
@@ -118,22 +116,21 @@ jobs:
           target: typecheck
       - name: Restore TypeScript build info
         if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
+          key: tsbuildinfo-main-${{ github.sha }}
           restore-keys: |
             tsbuildinfo-full-
-            tsbuildinfo-
       - name: Restore dist/out-tsc cache
         if: steps.count-typecheck.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: dist/out-tsc
-          key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
+          key: out-tsc-main-${{ github.sha }}
           restore-keys: |
+            out-tsc-main-
             out-tsc-full-
-            out-tsc-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
         run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
@@ -237,22 +234,24 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-${{ github.event.pull_request.number }}
+          key: tsbuildinfo-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
+            tsbuildinfo-pr-${{ github.event.pull_request.number }}-
+            tsbuildinfo-main-
             tsbuildinfo-full-
-            tsbuildinfo-
       - name: Restore dist/out-tsc cache
         if: steps.count-typecheck.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: dist/out-tsc
-          key: out-tsc-${{ github.event.pull_request.number }}
+          key: out-tsc-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
+            out-tsc-pr-${{ github.event.pull_request.number }}-
+            out-tsc-main-
             out-tsc-full-
-            out-tsc-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
+        run: 'yarn nx affected -t typecheck --parallel=3'
 
   nightly-cache:
     runs-on: ubuntu-latest
@@ -291,21 +290,15 @@ jobs:
           path: '**/.jest/cache'
           key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
-      - name: Restore TypeScript build info
-        uses: actions/cache@v5
+      - name: Run typecheck for all projects
+        run: 'yarn nx run-many -t typecheck --all --parallel=3'
+      - name: Save TypeScript build info
+        uses: actions/cache/save@v5
         with:
           path: '**/*.tsbuildinfo'
           key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: |
-            tsbuildinfo-full-
-            tsbuildinfo-
-      - name: Restore dist/out-tsc cache
-        uses: actions/cache@v5
+      - name: Save dist/out-tsc cache
+        uses: actions/cache/save@v5
         with:
           path: dist/out-tsc
           key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: |
-            out-tsc-full-
-            out-tsc-
-      - name: Run typecheck for all projects
-        run: 'yarn nx run-many -t typecheck --all --parallel=3'
