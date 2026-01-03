@@ -49,5 +49,6 @@ Thumbs.db
 **/*.tsbuildinfo
 .eslintcache
 .jest/
+.eslint/
 .tsbuildinfo.json
 
