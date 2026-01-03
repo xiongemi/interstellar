@@ -18,15 +18,18 @@
   "targetDefaults": {
     "test": {
       "options": {
-        "passWithNoTests": true,
-        "cache": true,
-        "cacheDirectory": ".jest/cache"
+        "passWithNoTests": true
       }
     },
     "lint": {
       "options": {
         "cache": true,
         "cache-strategy": "content"
+      },
+      "configurations": {
+        "ci": {
+          "cache-location": "$HOME/.eslint/"
+        }
       }
     },
     "build-lib": {

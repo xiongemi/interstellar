@@ -49,14 +49,20 @@ jobs:
         if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
-          path: '**/.eslintcache'
-          key: eslint-full-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          path: ~/.eslint
+          key: eslint-main-${{ github.sha }}
           restore-keys: |
+            eslint-main-
             eslint-full-
-            eslint-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected -t lint --parallel=3'
+        run: 'yarn nx affected -t lint --parallel=3 --configuration=ci'
+      - name: Save eslint cache
+        if: steps.count-lint.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.eslint
+          key: eslint-main-${{ github.sha }}
 
       - name: Count affected projects with test target
         id: count-test
@@ -70,13 +76,19 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-main-${{ github.sha }}
           restore-keys: |
+            jest-main-
             jest-full-
-            jest-
       - name: Run test
         if: steps.count-test.outputs.count > 0
         run: 'yarn nx affected -t test --parallel=3'
+      - name: Save Jest cache
+        if: steps.count-test.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: '**/.jest/cache'
+          key: jest-main-${{ github.sha }}
 
       - name: Count affected projects with build target
         id: count-build
@@ -169,14 +181,21 @@ jobs:
         if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
-          path: '**/.eslintcache'
-          key: eslint-${{ github.event.pull_request.number }}
+          path: ~/.eslint
+          key: eslint-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
+            eslint-pr-${{ github.event.pull_request.number }}-
+            eslint-main-
             eslint-full-
-            eslint-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected --target lint --parallel=3'
+        run: 'yarn nx affected --target lint --parallel=3 --configuration=ci'
+      - name: Save eslint cache
+        if: steps.count-lint.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.eslint
+          key: eslint-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
 
       - name: Count affected projects with test target
         id: count-test
@@ -188,13 +207,20 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
-          key: jest-${{ github.event.pull_request.number }}
+          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
+            jest-pr-${{ github.event.pull_request.number }}-
+            jest-main-
             jest-full-
-            jest-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'yarn nx run-many --target test --parallel=3'
+        run: 'yarn nx affected -t test --parallel=3'
+      - name: Save Jest cache
+        if: steps.count-test.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: '**/.jest/cache'
+          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
 
       - name: Count affected projects with build target
         id: count-build
@@ -273,30 +299,14 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Restore eslint cache files
-        uses: actions/cache@v5
-        with:
-          path: '**/.eslintcache'
-          key: eslint-full-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
-          restore-keys: |
-            eslint-full-
-            eslint-
       - name: Run lint for all projects
-        run: 'yarn nx run-many -t lint --all --parallel=3'
+        run: 'yarn nx run-many -t lint --all --parallel=3 --configuration=ci'
       - name: Save eslint cache
         uses: actions/cache/save@v5
         with:
-          path: '**/.eslintcache'
-          key: eslint-full-${{ hashFiles('**/.eslintrc*', 'nx.json') }}
+          path: ~/.eslint
+          key: eslint-full-${{ hashFiles('nx.json') }}
 
-      - name: Restore Jest cache files
-        uses: actions/cache@v5
-        with:
-          path: '**/.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
-          restore-keys: |
-            jest-full-
-            jest-
       - name: Run test for all projects
         run: 'yarn nx run-many -t test --all --parallel=3'
       - name: Save jest cache
