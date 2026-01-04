@@ -28,4 +28,3 @@ runs:
         COUNT=$(yarn nx show projects --affected --withTarget ${{ inputs.target }} $BASE_ARGS | wc -l || echo "0")
         echo "count=$COUNT" >> $GITHUB_OUTPUT
         echo "Found $COUNT affected projects with ${{ inputs.target }} target"
-
