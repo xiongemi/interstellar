@@ -55,7 +55,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
         with:
-          path: '.jest/cache'
+          path: .jest/cache
           key: jest-pr-${{ github.event.pull_request.number }}
           restore-keys: |
             jest-pr-${{ github.event.pull_request.number }}
@@ -69,6 +69,15 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: build
+      - name: Restore Next.js Build Cache
+        if: steps.count-build.outputs.count > 0
+        uses: actions/cache@v5
+        with:
+          path: .next/**/cache
+          key: nextjs-cache-pr-${{ github.event.pull_request.number }}
+          restore-keys: |
+            nextjs-cache-pr-${{ github.event.pull_request.number }}
+            nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected --target build --parallel=3'

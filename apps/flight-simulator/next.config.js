@@ -5,6 +5,7 @@ const withNx = require('@nx/next/plugins/with-nx');
  **/
 const nextConfig = {
   nx: {},
+  distDir: '../../.next/flight-simulator',
 };
 
 module.exports = withNx(nextConfig);
