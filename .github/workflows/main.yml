@@ -89,14 +89,6 @@ jobs:
           target: e2e
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
-      - name: Cache Cypress installation
-        if: steps.count-e2e.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
         uses: cypress-io/github-action@v6
