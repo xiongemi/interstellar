@@ -5,9 +5,6 @@ on:
     branches:
       - main
   pull_request:
-  schedule:
-    # Run nightly at 2 AM UTC
-    - cron: '0 2 * * *'
 
 env:
   NODE_OPTIONS: '--max_old_space_size=4096'
@@ -47,11 +44,12 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore eslint cache files
         if: steps.count-lint.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: ~/.eslint
-          key: eslint-full-${{ hashFiles('nx.json') }}
-          restore-keys: eslint-full-
+          key: eslint-main-${{ github.sha }}
+          restore-keys: |
+            eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
         run: 'yarn nx affected -t lint --parallel=3 --configuration=ci'
@@ -65,11 +63,12 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
         if: steps.count-test.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: '**/.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
-          restore-keys: jest-full-
+          key: jest-main-${{ github.sha }}
+          restore-keys: |
+            jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
         run: 'yarn nx affected -t test --parallel=3'
@@ -114,18 +113,20 @@ jobs:
           target: typecheck
       - name: Restore TypeScript build info
         if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: tsbuildinfo-full-
+          key: tsbuildinfo-main-${{ github.sha }}
+          restore-keys: |
+            tsbuildinfo-full-
       - name: Restore dist/out-tsc cache
         if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         with:
           path: dist/out-tsc
-          key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-          restore-keys: out-tsc-full-
+          key: out-tsc-main-${{ github.sha }}
+          restore-keys: |
+            out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
         run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
@@ -162,9 +163,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          key: eslint-pr-${{ github.event.pull_request.number }}
+          key: eslint-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
-            eslint-pr-${{ github.event.pull_request.number }}
+            eslint-pr-${{ github.event.pull_request.number }}-
             eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
@@ -180,9 +181,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
-          key: jest-pr-${{ github.event.pull_request.number }}
+          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
-            jest-pr-${{ github.event.pull_request.number }}
+            jest-pr-${{ github.event.pull_request.number }}-
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
@@ -226,69 +227,19 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-pr-${{ github.event.pull_request.number }}
+          key: tsbuildinfo-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
-            tsbuildinfo-pr-${{ github.event.pull_request.number }}
+            tsbuildinfo-pr-${{ github.event.pull_request.number }}-
             tsbuildinfo-full-
       - name: Restore dist/out-tsc cache
         if: steps.count-typecheck.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: dist/out-tsc
-          key: out-tsc-pr-${{ github.event.pull_request.number }}
+          key: out-tsc-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
-            out-tsc-pr-${{ github.event.pull_request.number }}
+            out-tsc-pr-${{ github.event.pull_request.number }}-
             out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
         run: 'yarn nx affected -t typecheck --parallel=3'
-
-  nightly-cache:
-    runs-on: ubuntu-latest
-    timeout-minutes: 240
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch')
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Enable Corepack (Yarn 4)
-        run: corepack enable
-      - name: Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: node-modules-
-      - run: yarn install --frozen-lockfile
-
-      - name: Run lint for all projects
-        run: 'yarn nx run-many -t lint --all --parallel=3 --configuration=ci'
-      - name: Save eslint cache
-        uses: actions/cache/save@v5
-        with:
-          path: ~/.eslint
-          key: eslint-full-${{ hashFiles('nx.json') }}
-
-      - name: Run test for all projects
-        run: 'yarn nx run-many -t test --all --parallel=3'
-      - name: Save jest cache
-        uses: actions/cache/save@v5
-        with:
-          path: '**/.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
-
-      - name: Run typecheck for all projects
-        run: 'yarn nx run-many -t typecheck --all --parallel=3'
-      - name: Save TypeScript build info
-        uses: actions/cache/save@v5
-        with:
-          path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
-      - name: Save dist/out-tsc cache
-        uses: actions/cache/save@v5
-        with:
-          path: dist/out-tsc
-          key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
