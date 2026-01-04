@@ -47,7 +47,7 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore eslint cache files
         if: steps.count-lint.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
           path: ~/.eslint
           key: eslint-full-${{ hashFiles('nx.json') }}
@@ -65,7 +65,7 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
         if: steps.count-test.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
           path: '**/.jest/cache'
           key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
@@ -114,14 +114,14 @@ jobs:
           target: typecheck
       - name: Restore TypeScript build info
         if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
           path: '**/*.tsbuildinfo'
           key: tsbuildinfo-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
           restore-keys: tsbuildinfo-full-
       - name: Restore dist/out-tsc cache
         if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
           path: dist/out-tsc
           key: out-tsc-full-${{ hashFiles('tsconfig*.json', 'nx.json') }}
