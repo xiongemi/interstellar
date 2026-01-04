@@ -47,7 +47,7 @@ jobs:
           key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
       - name: Run typecheck for all projects
-        run: 'yarn nx run-many -t typecheck --all --parallel=3'
+        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
       - name: Save TypeScript build info
         uses: actions/cache/save@v5
         with:

@@ -18,7 +18,9 @@
   "targetDefaults": {
     "test": {
       "options": {
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "cache": true,
+        "maxWorkers": "50%"
       }
     },
     "lint": {

@@ -26,7 +26,7 @@ export default defineConfig({
       if (preset.setupNodeEvents) {
         preset.setupNodeEvents(on, config);
       }
-      
+
       // Add our custom browser launch options
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.family === 'chromium' && browser.name !== 'electron') {
