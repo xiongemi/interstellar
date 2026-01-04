@@ -43,7 +43,7 @@ jobs:
       - name: Save jest cache
         uses: actions/cache/save@v5
         with:
-          path: '**/.jest/cache'
+          path: '.jest/cache'
           key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
       - name: Run typecheck for all projects
