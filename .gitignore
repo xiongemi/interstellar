@@ -51,4 +51,6 @@ Thumbs.db
 .jest/
 .eslint/
 .tsbuildinfo.json
+next-env.d.ts
+.next/
 

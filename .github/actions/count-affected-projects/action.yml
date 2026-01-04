@@ -25,6 +25,11 @@ runs:
         if [ -n "${{ inputs.base }}" ] && [ -n "${{ inputs.head }}" ]; then
           BASE_ARGS="--base=${{ inputs.base }} --head=${{ inputs.head }}"
         fi
-        COUNT=$(yarn nx show projects --affected --withTarget ${{ inputs.target }} $BASE_ARGS | wc -l || echo "0")
+        AFFECTED_PROJECTS=$(yarn nx show projects --affected --withTarget ${{ inputs.target }} $BASE_ARGS)
+        if [ -z "$AFFECTED_PROJECTS" ]; then
+          COUNT=0
+        else
+          COUNT=$(echo "$AFFECTED_PROJECTS" | wc -l)
+        fi
         echo "count=$COUNT" >> $GITHUB_OUTPUT
         echo "Found $COUNT affected projects with ${{ inputs.target }} target"

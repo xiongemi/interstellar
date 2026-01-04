@@ -78,6 +78,14 @@ jobs:
           target: build
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
+      - name: Restore Next.js Build Cache
+        if: steps.count-build.outputs.count > 0
+        uses: actions/cache/restore@v5
+        with:
+          path: .next/**/cache
+          key: nextjs-cache-main-${{ github.sha }}
+          restore-keys: |
+            nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn nx affected -t build --parallel=3'

@@ -46,6 +46,14 @@ jobs:
           path: '.jest/cache'
           key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
 
+      - name: Run build for all projects
+        run: 'yarn nx run-many -t build --all --parallel=3'
+      - name: Save Next.js Build Cache
+        uses: actions/cache/save@v5
+        with:
+          path: .next/**/cache
+          key: nextjs-cache-full-${{ hashFiles('**/next.config.js', '**/tsconfig.json', 'yarn.lock') }}
+
       - name: Run typecheck for all projects
         run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
       - name: Save TypeScript build info
