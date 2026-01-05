@@ -19,19 +19,7 @@
     "test": {
       "options": {
         "passWithNoTests": true,
-        "cache": true,
         "maxWorkers": "50%"
-      }
-    },
-    "lint": {
-      "options": {
-        "cache": true,
-        "cache-strategy": "content"
-      },
-      "configurations": {
-        "ci": {
-          "cache-location": "$HOME/.eslint/"
-        }
       }
     },
     "build-lib": {
