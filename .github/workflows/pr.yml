@@ -28,6 +28,19 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
+      - name: Restore Jest cache files
+        if: true
+        uses: actions/cache@v5
+        with:
+          path: .jest/cache
+          key: jest-pr-${{ github.event.pull_request.number }}
+          restore-keys: |
+            jest-pr-${{ github.event.pull_request.number }}
+            jest-full-
+      - name: Run test
+        if: true
+        run: 'yarn nx run-many -t test --parallel=3'
+
       - name: Count affected projects with lint target
         id: count-lint
         uses: ./.github/actions/count-affected-projects
@@ -45,24 +58,6 @@ jobs:
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
         run: 'yarn nx affected --target lint --parallel=3 --configuration=ci'
-
-      - name: Count affected projects with test target
-        id: count-test
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: test
-      - name: Restore Jest cache files
-        if: steps.count-test.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: .jest/cache
-          key: jest-pr-${{ github.event.pull_request.number }}
-          restore-keys: |
-            jest-pr-${{ github.event.pull_request.number }}
-            jest-full-
-      - name: Run test
-        if: steps.count-test.outputs.count > 0
-        run: 'yarn nx affected -t test --parallel=3 --changedSince=origin/main'
 
       - name: Count affected projects with build target
         id: count-build
