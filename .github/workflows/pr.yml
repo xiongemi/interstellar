@@ -28,13 +28,7 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Count affected projects with lint target
-        id: count-lint
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: lint
       - name: Restore eslint cache files
-        if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: ~/.eslint
@@ -43,16 +37,9 @@ jobs:
             eslint-pr-${{ github.event.pull_request.number }}
             eslint-full-
       - name: Run lint
-        if: steps.count-lint.outputs.count > 0
         run: 'npx eslint . --cache --cache-strategy content --concurrency auto --cache-location ~/.eslint/'
 
-      - name: Count affected projects with test target
-        id: count-test
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: test
       - name: Restore Jest cache files
-        if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: .jest/cache
@@ -61,7 +48,6 @@ jobs:
             jest-pr-${{ github.event.pull_request.number }}
             jest-full-
       - name: Run test
-        if: steps.count-test.outputs.count > 0
         run: 'npx jest --changedSince=origin/main'
 
       - name: Count affected projects with build target
