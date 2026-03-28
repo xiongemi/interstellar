@@ -54,3 +54,6 @@ Thumbs.db
 next-env.d.ts
 .next/
 
+
+.claude/worktrees
+.claude/settings.local.json
