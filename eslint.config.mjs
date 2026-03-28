@@ -18,6 +18,8 @@ export default [
       'apps/*/.next/**',
       'libs/*/.next/**',
       '**/.nx/cache',
+      '**/.next/**',
+      '**/node_modules/**',
     ],
   },
   { plugins: { '@nx': nxEslintPlugin, 'jsx-a11y': jsxA11yPlugin } },
