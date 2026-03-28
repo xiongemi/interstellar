@@ -44,7 +44,7 @@ jobs:
             eslint-full-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected --target lint --parallel=3 --configuration=ci'
+        run: 'npx eslint . --cache --cache-strategy content --concurrency auto --cache-location ~/.eslint/'
 
       - name: Count affected projects with test target
         id: count-test
@@ -62,7 +62,7 @@ jobs:
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'yarn nx affected -t test --parallel=3 --changedSince=origin/main'
+        run: 'npx jest --changedSince=origin/main'
 
       - name: Count affected projects with build target
         id: count-build
