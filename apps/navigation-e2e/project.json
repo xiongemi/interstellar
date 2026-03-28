@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/navigation-e2e",
   "projectType": "application",
+  "tags": ["e2e"],
   "targets": {
     "find-specs": {
       "executor": "nx:run-commands",
@@ -11,6 +12,5 @@
         "cwd": "{projectRoot}"
       }
     }
-  },
-  "tags": ["e2e"]
+  }
 }

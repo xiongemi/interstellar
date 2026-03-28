@@ -46,7 +46,6 @@
     }
   },
   "plugins": [
-    "@nx/cypress/plugin",
     "@nx/eslint/plugin",
     "@nx/jest/plugin",
     "@nx/next/plugin",
@@ -60,6 +59,12 @@
       },
       "include": ["libs/**/*"],
       "exclude": ["apps/**/*", "apps/*-e2e/**/*"]
+    },
+    {
+      "plugin": "@nx/playwright/plugin",
+      "options": {
+        "targetName": "e2e"
+      }
     }
   ]
 }

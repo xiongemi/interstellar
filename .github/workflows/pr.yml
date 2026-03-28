@@ -87,11 +87,12 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: e2e
+      - name: Install Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0
+        run: npx playwright install --with-deps
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        uses: cypress-io/github-action@v6
-        with:
-          command: yarn nx affected -t e2e --parallel=1
+        run: yarn nx affected -t e2e --parallel=1
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
