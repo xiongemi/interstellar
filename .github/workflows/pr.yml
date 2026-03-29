@@ -37,7 +37,7 @@ jobs:
             eslint-pr-${{ github.event.pull_request.number }}
             eslint-full-
       - name: Run lint
-        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/ --concurrency 2'
 
       - name: Restore Jest cache files
         uses: actions/cache@v5
@@ -48,7 +48,7 @@ jobs:
             jest-pr-${{ github.event.pull_request.number }}
             jest-full-
       - name: Run test
-        run: 'yarn jest --changedSince=origin/main'
+        run: 'yarn jest --cache --cacheDirectory=.jest/cache'
 
       - name: Count affected projects with build target
         id: count-build
