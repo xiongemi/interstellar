@@ -37,7 +37,7 @@ jobs:
             eslint-pr-${{ github.event.pull_request.number }}
             eslint-full-
       - name: Run lint
-        run: 'npx eslint . --cache --cache-strategy content --concurrency auto --cache-location ~/.eslint/'
+        run: 'npx eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
       - name: Restore Jest cache files
         uses: actions/cache@v5
