@@ -64,6 +64,7 @@
       "options": {
         "compiler": "tsgo",
         "build": {
+          "compiler": "tsgo",
           "targetName": "build-lib",
           "configName": "tsconfig.lib.json"
         }
