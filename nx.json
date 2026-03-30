@@ -3,8 +3,13 @@
     "defaultBase": "origin/main"
   },
   "namedInputs": {
-    "default": ["sharedGlobals", "{projectRoot}/**/*"],
-    "sharedGlobals": ["{workspaceRoot}/babel.config.json"],
+    "default": [
+      "sharedGlobals",
+      "{projectRoot}/**/*"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/babel.config.json"
+    ],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -36,12 +41,17 @@
     },
     "build-lib": {
       "options": {
-        "args": ["--verbose"]
+        "args": [
+          "--verbose"
+        ]
       }
     },
     "typecheck": {
       "options": {
-        "args": ["tsconfig.lib.json", "--verbose"]
+        "args": [
+          "tsconfig.lib.json",
+          "--verbose"
+        ]
       }
     }
   },
@@ -52,13 +62,19 @@
     {
       "plugin": "@nx/js/typescript",
       "options": {
+        "compiler": "tsgo",
         "build": {
           "targetName": "build-lib",
           "configName": "tsconfig.lib.json"
         }
       },
-      "include": ["libs/**/*"],
-      "exclude": ["apps/**/*", "apps/*-e2e/**/*"]
+      "include": [
+        "libs/**/*"
+      ],
+      "exclude": [
+        "apps/**/*",
+        "apps/*-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/playwright/plugin",
