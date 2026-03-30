@@ -86,8 +86,9 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: .next/**/cache
-          key: nextjs-cache-main-${{ github.sha }}
+          key: nextjs-cache-main-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
+            nextjs-cache-main-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-
             nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
