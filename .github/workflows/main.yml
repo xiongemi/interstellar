@@ -45,8 +45,11 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', '**/*.js', '**/*.ts', '**/*.tsx', 'nx.json') }}
+          # 1. Only hash configs and lockfiles to save CI boot time.
+          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
             eslint-${{ runner.os }}-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
