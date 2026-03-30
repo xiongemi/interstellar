@@ -130,4 +130,4 @@ jobs:
             out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
+        run: 'yarn tsgo --build --verbose'
