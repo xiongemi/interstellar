@@ -32,14 +32,20 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          key: eslint-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', '**/*.js', '**/*.ts', '**/*.tsx', 'nx.json') }}
           restore-keys: |
-            eslint-pr-${{ github.event.pull_request.number }}-
+            eslint-${{ runner.os }}-
             eslint-full-
       - name: Run lint
-        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
+        run: 'yarn eslint . --concurrency=2'
 
+      - name: Count affected projects with test target
+        id: count-test
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: test
       - name: Restore Jest cache files
+        if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: .jest/cache
@@ -48,6 +54,7 @@ jobs:
             jest-pr-${{ github.event.pull_request.number }}-
             jest-full-
       - name: Run test
+        if: steps.count-test.outputs.count > 0
         run: 'yarn jest --cache --cacheDirectory=.jest/cache'
 
       - name: Count affected projects with build target
@@ -59,14 +66,20 @@ jobs:
         if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
-          path: .next/**/cache
-          key: nextjs-cache-pr-${{ github.event.pull_request.number }}
+          # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
+          path: |
+            node_modules/.cache/next
+            ${{ github.workspace }}/.next/cache
+            .next/**/cache
+          # Generate a new cache whenever packages or source files change.
+          key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            nextjs-cache-pr-${{ github.event.pull_request.number }}
+            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock') }}-
+            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-
             nextjs-cache-full-
       - name: Run build
-        if: steps.count-build.outputs.count > 0
-        run: 'yarn nx affected --target build --parallel=3'
+        run: 'yarn build:all'
 
       - name: Count affected projects with e2e target
         id: count-e2e
