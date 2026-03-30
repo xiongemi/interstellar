@@ -121,4 +121,4 @@ jobs:
             out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx affected -t typecheck --parallel=3'
+        run: 'yarn tsgo --build'
