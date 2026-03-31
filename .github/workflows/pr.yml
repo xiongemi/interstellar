@@ -40,7 +40,7 @@ jobs:
             eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
             eslint-${{ runner.os }}-
       - name: Run lint
-        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/ --concurrency=2'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/ --concurrency=4'
 
       - name: Count affected projects with test target
         id: count-test
@@ -60,7 +60,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest --cache --cacheDirectory=.jest/cache --maxWorkers=2
+          yarn jest --cache --cacheDirectory=.jest/cache --maxWorkers=4
 
       - name: Count affected projects with build target
         id: count-build
@@ -82,7 +82,7 @@ jobs:
             nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
             nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
-        run: 'yarn build:all'
+        run: 'yarn nx affected -t build --parallel=2'
 
       - name: Count affected projects with e2e target
         id: count-e2e
