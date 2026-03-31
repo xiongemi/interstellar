@@ -155,4 +155,4 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn tsgo --build --verbose'
+        run: 'yarn tsc --build --verbose'
