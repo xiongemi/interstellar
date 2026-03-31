@@ -104,11 +104,21 @@ jobs:
           target: e2e
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
+      - name: Cache Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+      - name: Install Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0 && steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        uses: cypress-io/github-action@v6
-        with:
-          command: yarn nx affected -t e2e --parallel=1
+        run: yarn nx affected -t e2e --parallel=1
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
