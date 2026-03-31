@@ -45,6 +45,7 @@
     "@types/react-dom": "18.2.9",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
     "@typescript-eslint/parser": "^8.40.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260329.1",
     "babel-jest": "30.0.5",
     "css-loader": "^6.4.0",
     "dotenv": "8.2.0",

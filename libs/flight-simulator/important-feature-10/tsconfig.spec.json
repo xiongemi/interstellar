@@ -2,10 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
-    "module": "commonjs",
+    "module": "esnext",
     "types": ["jest", "node"]
   },
   "include": [
+    "**/*.ts",
+    "**/*.tsx",
     "**/*.spec.ts",
     "**/*.test.ts",
     "**/*.spec.tsx",
@@ -15,5 +17,14 @@
     "**/*.spec.jsx",
     "**/*.test.jsx",
     "**/*.d.ts"
+  ]
+,
+  "references": [
+    {"path": "./tsconfig.lib.json"},
+    {"path": "../../shared/buttons/tsconfig.lib.json"},
+    {"path": "../../shared/icons/tsconfig.lib.json"},
+    {"path": "../../shared/dialogs/tsconfig.lib.json"},
+    {"path": "../../shared/alerts/tsconfig.lib.json"},
+    {"path": "../../shared/components/tsconfig.lib.json"}
   ]
 }

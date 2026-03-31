@@ -5,6 +5,7 @@ on:
 
 env:
   NODE_OPTIONS: '--max_old_space_size=4096'
+  NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
   pr:
@@ -28,23 +29,18 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
-      - name: Count affected projects with lint target
-        id: count-lint
-        uses: ./.github/actions/count-affected-projects
-        with:
-          target: lint
       - name: Restore eslint cache files
-        if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          key: eslint-pr-${{ github.event.pull_request.number }}
+          # 1. Only hash configs and lockfiles to save CI boot time.
+          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
-            eslint-pr-${{ github.event.pull_request.number }}
-            eslint-full-
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
+            eslint-${{ runner.os }}-
       - name: Run lint
-        if: steps.count-lint.outputs.count > 0
-        run: 'npx eslint . --cache --cache-strategy content --concurrency auto --cache-location ~/.eslint/'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
       - name: Count affected projects with test target
         id: count-test
@@ -56,13 +52,15 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .jest/cache
-          key: jest-pr-${{ github.event.pull_request.number }}
+          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
           restore-keys: |
-            jest-pr-${{ github.event.pull_request.number }}
+            jest-pr-${{ github.event.pull_request.number }}-
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'npx jest --changedSince=origin/main'
+        run: |
+          mkdir -p .jest/cache
+          yarn jest --cache --cacheDirectory=.jest/cache
 
       - name: Count affected projects with build target
         id: count-build
@@ -73,22 +71,36 @@ jobs:
         if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
-          path: .next/**/cache
-          key: nextjs-cache-pr-${{ github.event.pull_request.number }}
+          # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
+          path: |
+            node_modules/.cache/next
+            ${{ github.workspace }}/.next
+          # Generate a new cache whenever packages or source files change.
+          key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            nextjs-cache-pr-${{ github.event.pull_request.number }}
+            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-
             nextjs-cache-full-
       - name: Run build
-        if: steps.count-build.outputs.count > 0
-        run: 'yarn nx affected --target build --parallel=3'
+        run: 'yarn build:all'
 
       - name: Count affected projects with e2e target
         id: count-e2e
         uses: ./.github/actions/count-affected-projects
         with:
           target: e2e
-      - name: Install Playwright Browsers
+      - name: Cache Playwright Browsers
         if: steps.count-e2e.outputs.count > 0
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+      - name: Install Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0 && steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
@@ -120,4 +132,4 @@ jobs:
             out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx affected -t typecheck --parallel=3'
+        run: 'yarn tsgo --build --verbose'

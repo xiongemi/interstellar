@@ -7,6 +7,7 @@ on:
 
 env:
   NODE_OPTIONS: '--max_old_space_size=4096'
+  NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
   main:
@@ -45,12 +46,15 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          key: eslint-full-${{ hashFiles('nx.json') }}
+          # 1. Only hash configs and lockfiles to save CI boot time.
+          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
+          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
-            eslint-full-
+            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
+            eslint-${{ runner.os }}-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
-        run: 'yarn nx affected -t lint --parallel=3 --configuration=ci'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
       - name: Count affected projects with test target
         id: count-test
@@ -69,7 +73,9 @@ jobs:
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'yarn nx affected -t test --parallel=3'
+        run: |
+          mkdir -p .jest/cache
+          yarn nx affected -t test --parallel=3
 
       - name: Count affected projects with build target
         id: count-build
@@ -80,11 +86,15 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore Next.js Build Cache
         if: steps.count-build.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
-          path: .next/**/cache
-          key: nextjs-cache-main-${{ github.sha }}
+          path: |
+            node_modules/.cache/next
+            ${{ github.workspace }}/.next
+          key: nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
+            nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-main-${{ runner.os }}-nextjs-
             nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
@@ -97,11 +107,21 @@ jobs:
           target: e2e
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
+      - name: Cache Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+      - name: Install Playwright Browsers
+        if: steps.count-e2e.outputs.count > 0 && steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        uses: cypress-io/github-action@v6
-        with:
-          command: yarn nx affected -t e2e --parallel=1
+        run: yarn nx affected -t e2e --parallel=1
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
@@ -127,4 +147,4 @@ jobs:
             out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
+        run: 'yarn tsgo --build --verbose'
