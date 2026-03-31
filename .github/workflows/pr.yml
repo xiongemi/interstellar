@@ -76,10 +76,10 @@ jobs:
             node_modules/.cache/next
             ${{ github.workspace }}/.next
           # Generate a new cache whenever packages or source files change.
-          key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+          key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
             nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-
             nextjs-cache-full-
       - name: Run build
