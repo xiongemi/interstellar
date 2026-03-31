@@ -71,8 +71,7 @@ jobs:
           # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
           path: |
             node_modules/.cache/next
-            ${{ github.workspace }}/.next/cache
-            .next/**/cache
+            ${{ github.workspace }}/.next
           # Generate a new cache whenever packages or source files change.
           key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           # If source files changed but packages didn't, rebuild from a prior cache.

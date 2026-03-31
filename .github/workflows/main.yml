@@ -83,12 +83,15 @@ jobs:
           head: ${{ env.NX_HEAD }}
       - name: Restore Next.js Build Cache
         if: steps.count-build.outputs.count > 0
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
-          path: .next/**/cache
-          key: nextjs-cache-main-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+          path: |
+            node_modules/.cache/next
+            ${{ github.workspace }}/.next
+          key: nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
-            nextjs-cache-main-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js', '**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-main-${{ runner.os }}-nextjs-
             nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
