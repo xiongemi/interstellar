@@ -91,12 +91,11 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            ${{ github.workspace }}/.next
-          key: nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+            .next
+          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
-            nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
-            nextjs-cache-main-${{ runner.os }}-nextjs-
-            nextjs-cache-full-
+            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn build:all'
