@@ -24,8 +24,7 @@
     "test": {
       "options": {
         "passWithNoTests": true,
-        "cache": true,
-        "maxWorkers": "50%"
+        "cache": true
       }
     },
     "lint": {
