@@ -58,7 +58,9 @@ jobs:
             jest-full-
       - name: Run test
         if: steps.count-test.outputs.count > 0
-        run: 'yarn jest --cache --cacheDirectory=.jest/cache'
+        run: |
+          mkdir -p .jest/cache
+          yarn jest --cache --cacheDirectory=.jest/cache
 
       - name: Count affected projects with build target
         id: count-build
