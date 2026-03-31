@@ -131,6 +131,6 @@ jobs:
           restore-keys: |
             out-tsc-pr-${{ github.event.pull_request.number }}
             out-tsc-full-
-      - name: Run typecheck
+      - name: Run tsc
         if: steps.count-typecheck.outputs.count > 0
-        run: 'yarn tsgo --build --verbose'
+        run: 'yarn tsc --build --verbose'
