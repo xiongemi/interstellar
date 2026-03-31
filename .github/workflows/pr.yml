@@ -41,7 +41,7 @@ jobs:
             eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
             eslint-${{ runner.os }}-
       - name: Run lint
-        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/ --concurrency=2'
 
       - name: Count affected projects with test target
         id: count-test
@@ -61,7 +61,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest --cache --cacheDirectory=.jest/cache
+          yarn jest --cache --cacheDirectory=.jest/cache --maxWorkers=2
 
       - name: Count affected projects with build target
         id: count-build
