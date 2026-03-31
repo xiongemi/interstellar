@@ -76,7 +76,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn nx affected -t test --parallel=3
+          yarn jest --cache --cacheDirectory=.jest/cache
 
       - name: Count affected projects with build target
         id: count-build
@@ -99,7 +99,7 @@ jobs:
             nextjs-cache-full-
       - name: Run build
         if: steps.count-build.outputs.count > 0
-        run: 'yarn nx affected -t build --parallel=3'
+        run: 'yarn build:all'
 
       - name: Count affected projects with e2e target
         id: count-e2e
