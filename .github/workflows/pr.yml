@@ -74,10 +74,9 @@ jobs:
         if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
-          # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
           path: |
             node_modules/.cache/next
-            .next
+            apps/*/.next/cache
           # Generate a new cache whenever packages or source files change.
           key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           # If source files changed but packages didn't, rebuild from a prior cache.
