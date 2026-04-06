@@ -33,6 +33,7 @@ jobs:
           key: node-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
+      - run: yarn nx show projects
 
       - name: Count affected projects with lint target
         id: count-lint
