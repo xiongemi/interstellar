@@ -13,9 +13,6 @@ jobs:
   main:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      NX_BASE: ${{ github.event.before }}
-      NX_HEAD: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout [main]
@@ -34,6 +31,9 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - run: yarn nx show projects
+
+      - name: Derive appropriate SHAs for base and head
+        uses: nrwl/nx-set-shas@v4
 
       - name: Count affected projects with lint target
         id: count-lint

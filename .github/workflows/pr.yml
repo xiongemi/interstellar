@@ -46,11 +46,16 @@ jobs:
         run: free -m
       - run: yarn jest --showConfig
 
+      - name: Derive appropriate SHAs for base and head
+        uses: nrwl/nx-set-shas@v4
+        
       - name: Count affected projects with test target
         id: count-test
         uses: ./.github/actions/count-affected-projects
         with:
           target: test
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
         if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
@@ -64,13 +69,15 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest 
+          yarn jest --changedSince=${{ env.NX_BASE }}
 
       - name: Count affected projects with build target
         id: count-build
         uses: ./.github/actions/count-affected-projects
         with:
           target: build
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Next.js Build Cache
         if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
@@ -92,6 +99,8 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: e2e
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Cache Playwright Browsers
         if: steps.count-e2e.outputs.count > 0
         uses: actions/cache@v5
@@ -119,6 +128,8 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: typecheck
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore TypeScript build info
         if: steps.count-typecheck.outputs.count > 0
         uses: actions/cache@v5
