@@ -44,6 +44,7 @@ jobs:
 
       - name: Monitor memory usage
         run: free -m
+      - run: yarn jest --showConfig
 
       - name: Count affected projects with test target
         id: count-test
@@ -63,7 +64,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest --runInBand
+          yarn jest 
 
       - name: Count affected projects with build target
         id: count-build
