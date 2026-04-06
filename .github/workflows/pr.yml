@@ -28,6 +28,8 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - run: yarn nx show projects
+      - name: Derive appropriate SHAs for base and head
+        uses: nrwl/nx-set-shas@v4
 
       - name: Restore eslint cache files
         uses: actions/cache@v5
@@ -40,14 +42,11 @@ jobs:
             eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
             eslint-${{ runner.os }}-
       - name: Run lint
-        run: 'yarn eslint . --concurrency=2'
+        run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
       - name: Monitor memory usage
         run: free -m
       - run: yarn jest --showConfig
-
-      - name: Derive appropriate SHAs for base and head
-        uses: nrwl/nx-set-shas@v4
         
       - name: Count affected projects with test target
         id: count-test
