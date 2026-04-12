@@ -35,11 +35,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          # 1. Only hash configs and lockfiles to save CI boot time.
-          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
+            eslint-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             eslint-${{ runner.os }}-
       - name: Run lint
         run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
@@ -60,7 +58,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .jest/cache
-          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          key: jest-pr-${{ github.event.pull_request.number }}
           restore-keys: |
             jest-pr-${{ github.event.pull_request.number }}-
             jest-full-
@@ -84,11 +82,9 @@ jobs:
           path: |
             node_modules/.cache/next
             apps/*/.next/cache
-          # Generate a new cache whenever packages or source files change.
-          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
+          key: nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
           restore-keys: |
-            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         run: 'yarn build:all'
