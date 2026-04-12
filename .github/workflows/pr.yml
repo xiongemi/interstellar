@@ -100,9 +100,14 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package.json') }}
           restore-keys: |
             playwright-${{ runner.os }}-
+      # Always install OS packages: browser cache restore skips install, and WebKit needs
+      # libs like libwoff2dec that --with-deps would otherwise apt-install.
+      - name: Install Playwright system dependencies
+        if: steps.count-e2e.outputs.count > 0
+        run: npx playwright install-deps
       - name: Install Playwright Browsers
         if: steps.count-e2e.outputs.count > 0 && steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
+        run: npx playwright install
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
         run: yarn run e2e:all
