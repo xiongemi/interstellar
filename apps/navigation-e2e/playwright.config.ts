@@ -26,8 +26,9 @@ export default defineConfig({
   webServer: {
     command: 'nx run navigation:start',
     url: 'http://localhost:3003',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
+    timeout: process.env.CI ? 180_000 : 90_000,
   },
   projects: [
     {

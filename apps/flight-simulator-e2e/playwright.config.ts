@@ -26,8 +26,9 @@ export default defineConfig({
   webServer: {
     command: 'nx run flight-simulator:start',
     url: 'http://localhost:3002',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     cwd: workspaceRoot,
+    timeout: process.env.CI ? 180_000 : 90_000,
   },
   projects: [
     {
