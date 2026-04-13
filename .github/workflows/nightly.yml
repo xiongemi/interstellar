@@ -76,6 +76,11 @@ jobs:
             nextjs-main-${{ runner.os }}-
       - name: Run build for all projects
         run: 'yarn nx run-many -t build --all --parallel=3'
+      - name: Debug Next.js cache sizes
+        run: |
+          for p in node_modules/.cache/next .next/crew/cache .next/flight-simulator/cache .next/navigation/cache .next/ticket-booking/cache .next/warp-drive-manager/cache; do
+            if [ -d "$p" ]; then du -sh "$p"; else echo "$p (missing)"; fi
+          done
       - name: Save Next.js Build Cache
         uses: actions/cache/save@v5
         with:
