@@ -111,7 +111,12 @@ jobs:
             nextjs-main-${{ runner.os }}-
       - name: Run build
         if: steps.count-build.outputs.count > 0
-        run: 'yarn build:all'
+        run: |
+          yarn next build apps/crew
+          yarn next build apps/flight-simulator
+          yarn next build apps/navigation
+          yarn next build apps/ticket-booking
+          yarn next build apps/warp-drive-manager
       - name: Debug Next.js cache sizes
         if: steps.count-build.outputs.count > 0
         run: |

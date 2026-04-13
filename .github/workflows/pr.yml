@@ -109,7 +109,12 @@ jobs:
             nextjs-main-${{ runner.os }}-
       - name: Run build
         if: steps.count-build.outputs.count > 0
-        run: 'yarn build:all'
+        run: |
+          yarn next build apps/crew
+          yarn next build apps/flight-simulator
+          yarn next build apps/navigation
+          yarn next build apps/ticket-booking
+          yarn next build apps/warp-drive-manager
       - name: Debug Next.js cache sizes
         if: steps.count-build.outputs.count > 0
         run: |
@@ -143,7 +148,12 @@ jobs:
         run: npx playwright install
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        run: yarn run e2e:all:affected
+        run: |
+          yarn playwright test --reporter=list --only-changed="${NX_BASE}" -c apps/crew-e2e/playwright.config.ts
+          yarn playwright test --reporter=list --only-changed="${NX_BASE}" -c apps/flight-simulator-e2e/playwright.config.ts
+          yarn playwright test --reporter=list --only-changed="${NX_BASE}" -c apps/navigation-e2e/playwright.config.ts
+          yarn playwright test --reporter=list --only-changed="${NX_BASE}" -c apps/ticket-booking-e2e/playwright.config.ts
+          yarn playwright test --reporter=list --only-changed="${NX_BASE}" -c apps/warp-drive-manager-e2e/playwright.config.ts
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
