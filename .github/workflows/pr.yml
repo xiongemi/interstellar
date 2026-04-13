@@ -31,6 +31,8 @@ jobs:
       - run: yarn nx show projects
       - name: Derive appropriate SHAs for base and head
         uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: main
 
       - name: Restore eslint cache files
         uses: actions/cache@v5
