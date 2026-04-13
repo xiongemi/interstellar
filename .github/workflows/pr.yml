@@ -53,10 +53,6 @@ jobs:
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
         run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
-
-      - name: Monitor memory usage
-        run: free -m
-      - run: yarn jest --showConfig
         
       - name: Count affected projects with test target
         id: count-test
@@ -92,7 +88,7 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            .next
+            .next/**/cache
           key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-${{ github.sha }}
           restore-keys: |
             nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-
