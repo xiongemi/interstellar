@@ -3,11 +3,6 @@
   "version": "0.0.2",
   "license": "MIT",
   "private": true,
-  "scripts": {
-    "build:all": "yarn next build apps/crew && yarn next build apps/flight-simulator && yarn next build apps/navigation && yarn next build apps/ticket-booking && yarn next build apps/warp-drive-manager",
-    "e2e:all": "yarn playwright test -c apps/crew-e2e/playwright.config.ts && yarn playwright test -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test -c apps/navigation-e2e/playwright.config.ts && yarn playwright test -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test -c apps/warp-drive-manager-e2e/playwright.config.ts",
-    "e2e:all:affected": "yarn playwright test --only-changed=$NX_BASE -c apps/crew-e2e/playwright.config.ts && yarn playwright test --only-changed=$NX_BASE -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test --only-changed=$NX_BASE -c apps/navigation-e2e/playwright.config.ts && yarn playwright test --only-changed=$NX_BASE -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test --only-changed=$NX_BASE -c apps/warp-drive-manager-e2e/playwright.config.ts"
-  },
   "dependencies": {
     "core-js": "^3.6.5",
     "next": "16.1.7",
@@ -69,7 +64,6 @@
     "style-loader": "^3.3.0",
     "stylus": "^0.55.0",
     "stylus-loader": "^7.1.0",
-    "ts-jest": "29.4.5",
     "ts-node": "10.9.2",
     "typescript": "5.6.3",
     "typescript-eslint": "^8.40.0",

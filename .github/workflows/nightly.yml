@@ -75,7 +75,12 @@ jobs:
           restore-keys: |
             nextjs-main-${{ runner.os }}-
       - name: Run build for all projects
-        run: 'yarn nx run-many -t build --all --parallel=3'
+        run: |
+          yarn next build apps/crew
+          yarn next build apps/flight-simulator
+          yarn next build apps/navigation
+          yarn next build apps/ticket-booking
+          yarn next build apps/warp-drive-manager
       - name: Debug Next.js cache sizes
         run: |
           for p in node_modules/.cache/next .next/crew/cache .next/flight-simulator/cache .next/navigation/cache .next/ticket-booking/cache .next/warp-drive-manager/cache; do
