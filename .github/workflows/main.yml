@@ -35,6 +35,7 @@ jobs:
       - name: Derive appropriate SHAs for base and head
         uses: nrwl/nx-set-shas@v4
 
+      # Baseline cache keys (eslint-main-/jest-main-/nextjs-main-) must match nightly.yml and pr.yml restore-keys.
       - name: Count affected projects with lint target
         id: count-lint
         uses: ./.github/actions/count-affected-projects
@@ -47,15 +48,18 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          # 1. Only hash configs and lockfiles to save CI boot time.
-          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
+          key: eslint-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
-            eslint-${{ runner.os }}-
+            eslint-main-${{ runner.os }}-
       - name: Run lint
         if: steps.count-lint.outputs.count > 0
         run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
+      - name: Save eslint cache
+        if: success() && steps.count-lint.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: ~/.eslint
+          key: eslint-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}
 
       - name: Count affected projects with test target
         id: count-test
@@ -69,14 +73,20 @@ jobs:
         uses: actions/cache@v5
         with:
           path: '.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-main-${{ runner.os }}-${{ hashFiles('yarn.lock', 'nx.json', 'jest.preset.js', '**/jest.config.*') }}
           restore-keys: |
-            jest-full-
+            jest-main-${{ runner.os }}-
       - name: Run test
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
           yarn jest --cache
+      - name: Save Jest cache
+        if: success() && steps.count-test.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: '.jest/cache'
+          key: jest-main-${{ runner.os }}-${{ hashFiles('yarn.lock', 'nx.json', 'jest.preset.js', '**/jest.config.*') }}
 
       - name: Count affected projects with build target
         id: count-build
@@ -91,14 +101,29 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            .next
-          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-${{ github.sha }}
+            .next/crew/cache
+            .next/flight-simulator/cache
+            .next/navigation/cache
+            .next/ticket-booking/cache
+            .next/warp-drive-manager/cache
+          key: nextjs-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '**/next.config.*', 'nx.json') }}
           restore-keys: |
-            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-
-            nextjs-cache-${{ runner.os }}-nextjs-
+            nextjs-main-${{ runner.os }}-
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn build:all'
+      - name: Save Next.js Build Cache
+        if: success() && steps.count-build.outputs.count > 0
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            node_modules/.cache/next
+            .next/crew/cache
+            .next/flight-simulator/cache
+            .next/navigation/cache
+            .next/ticket-booking/cache
+            .next/warp-drive-manager/cache
+          key: nextjs-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '**/next.config.*', 'nx.json') }}
 
       - name: Count affected projects with e2e target
         id: count-e2e

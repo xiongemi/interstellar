@@ -8,7 +8,6 @@ const nextConfig = {
   distDir: '../../.next/warp-drive-manager',
   generateBuildId: async () => 'stable-build-id',
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
 };
 
 module.exports = withNx(nextConfig);
