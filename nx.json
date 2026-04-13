@@ -83,5 +83,6 @@
       }
     }
   ],
-  "analytics": false
+  "analytics": false,
+  "cache": 234
 }
