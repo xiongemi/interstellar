@@ -30,29 +30,63 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
 
+      # Baseline keys must match main.yml and pr.yml restore-keys.
+      - name: Restore eslint cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.eslint
+          key: eslint-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}
+          restore-keys: |
+            eslint-main-${{ runner.os }}-
       - name: Run lint for all projects
         run: 'yarn nx run-many -t lint --all --parallel=3 --configuration=ci'
       - name: Save eslint cache
         uses: actions/cache/save@v5
         with:
           path: ~/.eslint
-          key: eslint-full-${{ hashFiles('nx.json') }}
+          key: eslint-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}
 
+      - name: Restore Jest cache
+        uses: actions/cache@v5
+        with:
+          path: '.jest/cache'
+          key: jest-main-${{ runner.os }}-${{ hashFiles('yarn.lock', 'nx.json', 'jest.preset.js', '**/jest.config.*') }}
+          restore-keys: |
+            jest-main-${{ runner.os }}-
       - name: Run test for all projects
         run: 'yarn nx run-many -t test --all --parallel=3'
       - name: Save jest cache
         uses: actions/cache/save@v5
         with:
           path: '.jest/cache'
-          key: jest-full-${{ hashFiles('**/jest.config.js', 'nx.json') }}
+          key: jest-main-${{ runner.os }}-${{ hashFiles('yarn.lock', 'nx.json', 'jest.preset.js', '**/jest.config.*') }}
 
+      - name: Restore Next.js Build Cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules/.cache/next
+            .next/crew/cache
+            .next/flight-simulator/cache
+            .next/navigation/cache
+            .next/ticket-booking/cache
+            .next/warp-drive-manager/cache
+          key: nextjs-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '**/next.config.*', 'nx.json') }}
+          restore-keys: |
+            nextjs-main-${{ runner.os }}-
       - name: Run build for all projects
         run: 'yarn nx run-many -t build --all --parallel=3'
       - name: Save Next.js Build Cache
         uses: actions/cache/save@v5
         with:
-          path: .next/**/cache
-          key: nextjs-cache-full-${{ hashFiles('**/next.config.js', '**/tsconfig.json', 'yarn.lock') }}
+          path: |
+            node_modules/.cache/next
+            .next/crew/cache
+            .next/flight-simulator/cache
+            .next/navigation/cache
+            .next/ticket-booking/cache
+            .next/warp-drive-manager/cache
+          key: nextjs-main-${{ runner.os }}-${{ hashFiles('yarn.lock', '**/next.config.*', 'nx.json') }}
 
       - name: Run typecheck for all projects
         run: 'yarn nx run-many -t typecheck --projects="shared-*,crew-important-*" --parallel=3'
