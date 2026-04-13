@@ -3,9 +3,6 @@
   "version": "0.0.2",
   "license": "MIT",
   "private": true,
-  "scripts": {
-    "e2e:all": "yarn playwright test --reporter=list -c apps/crew-e2e/playwright.config.ts && yarn playwright test --reporter=list -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test --reporter=list -c apps/navigation-e2e/playwright.config.ts && yarn playwright test --reporter=list -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test --reporter=list -c apps/warp-drive-manager-e2e/playwright.config.ts"
-  },
   "dependencies": {
     "core-js": "^3.6.5",
     "next": "16.1.7",

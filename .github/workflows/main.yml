@@ -160,7 +160,12 @@ jobs:
         run: npx playwright install
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        run: yarn run e2e:all
+        run: |
+          yarn playwright test --reporter=list -c apps/crew-e2e/playwright.config.ts
+          yarn playwright test --reporter=list -c apps/flight-simulator-e2e/playwright.config.ts
+          yarn playwright test --reporter=list -c apps/navigation-e2e/playwright.config.ts
+          yarn playwright test --reporter=list -c apps/ticket-booking-e2e/playwright.config.ts
+          yarn playwright test --reporter=list -c apps/warp-drive-manager-e2e/playwright.config.ts
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
