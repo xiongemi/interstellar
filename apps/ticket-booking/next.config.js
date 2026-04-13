@@ -6,6 +6,7 @@ const withNx = require('@nx/next/plugins/with-nx');
 const nextConfig = {
   nx: {},
   distDir: '../../.next/ticket-booking',
+  generateBuildId: async () => 'stable-build-id',
 };
 
 module.exports = withNx(nextConfig);

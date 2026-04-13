@@ -31,8 +31,18 @@ jobs:
       - run: yarn nx show projects
       - name: Derive appropriate SHAs for base and head
         uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: main
 
+      - name: Count affected projects with lint target
+        id: count-lint
+        uses: ./.github/actions/count-affected-projects
+        with:
+          target: lint
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore eslint cache files
+        if: steps.count-lint.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: ~/.eslint
@@ -41,6 +51,7 @@ jobs:
             eslint-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             eslint-${{ runner.os }}-
       - name: Run lint
+        if: steps.count-lint.outputs.count > 0
         run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
       - name: Monitor memory usage
@@ -82,12 +93,12 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            apps/*/.next/cache
-          key: nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
+            .next
+          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}
           restore-keys: |
-            nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
+        if: steps.count-build.outputs.count > 0
         run: 'yarn build:all'
 
       - name: Count affected projects with e2e target
@@ -126,24 +137,6 @@ jobs:
           target: typecheck
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
-      - name: Restore TypeScript build info
-        if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: '**/*.tsbuildinfo'
-          key: tsbuildinfo-pr-${{ github.event.pull_request.number }}
-          restore-keys: |
-            tsbuildinfo-pr-${{ github.event.pull_request.number }}
-            tsbuildinfo-full-
-      - name: Restore dist/out-tsc cache
-        if: steps.count-typecheck.outputs.count > 0
-        uses: actions/cache@v5
-        with:
-          path: dist/out-tsc
-          key: out-tsc-pr-${{ github.event.pull_request.number }}
-          restore-keys: |
-            out-tsc-pr-${{ github.event.pull_request.number }}
-            out-tsc-full-
       - name: Run typecheck
         if: steps.count-typecheck.outputs.count > 0
         run: 'yarn tsgo --build --verbose'
