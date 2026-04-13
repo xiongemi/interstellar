@@ -92,9 +92,9 @@ jobs:
           path: |
             node_modules/.cache/next
             .next
-          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-${{ github.sha }}
           restore-keys: |
-            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}-
             nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         if: steps.count-build.outputs.count > 0
