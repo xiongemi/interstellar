@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build:all": "yarn next build apps/crew && yarn next build apps/flight-simulator && yarn next build apps/navigation && yarn next build apps/ticket-booking && yarn next build apps/warp-drive-manager",
-    "e2e:all": "yarn playwright test -c apps/crew-e2e/playwright.config.ts && yarn playwright test -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test -c apps/navigation-e2e/playwright.config.ts && yarn playwright test -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test -c apps/warp-drive-manager-e2e/playwright.config.ts"
+    "e2e:all": "yarn playwright test -c apps/crew-e2e/playwright.config.ts && yarn playwright test -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test -c apps/navigation-e2e/playwright.config.ts && yarn playwright test -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test -c apps/warp-drive-manager-e2e/playwright.config.ts",
+    "e2e:all:affected": "yarn playwright test --only-changed=origin/main -c apps/crew-e2e/playwright.config.ts && yarn playwright test --only-changed=origin/main -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test --only-changed=origin/main -c apps/navigation-e2e/playwright.config.ts && yarn playwright test --only-changed=origin/main -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test --only-changed=origin/main -c apps/warp-drive-manager-e2e/playwright.config.ts"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -50,7 +51,7 @@
     "babel-jest": "30.0.5",
     "css-loader": "^6.4.0",
     "dotenv": "8.2.0",
-    "eslint": "~9.39.2",
+    "eslint": "~9.39.4",
     "eslint-config-next": "16.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",

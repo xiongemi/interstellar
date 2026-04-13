@@ -12,10 +12,7 @@ env:
 jobs:
   main:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
-    env:
-      NX_BASE: ${{ github.event.before }}
-      NX_HEAD: ${{ github.sha }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         name: Checkout [main]
@@ -34,6 +31,9 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - run: yarn nx show projects
+
+      - name: Derive appropriate SHAs for base and head
+        uses: nrwl/nx-set-shas@v4
 
       - name: Count affected projects with lint target
         id: count-lint
@@ -76,7 +76,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn nx affected -t test --parallel=3
+          yarn jest --cache --cacheDirectory=.jest/cache
 
       - name: Count affected projects with build target
         id: count-build
@@ -91,15 +91,14 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            ${{ github.workspace }}/.next
-          key: nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
+            .next
+          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
           restore-keys: |
-            nextjs-cache-main-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
-            nextjs-cache-main-${{ runner.os }}-nextjs-
-            nextjs-cache-full-
+            nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
+            nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         if: steps.count-build.outputs.count > 0
-        run: 'yarn nx affected -t build --parallel=3'
+        run: 'yarn build:all'
 
       - name: Count affected projects with e2e target
         id: count-e2e

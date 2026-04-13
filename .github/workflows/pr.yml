@@ -10,7 +10,7 @@ env:
 jobs:
   pr:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,31 +29,37 @@ jobs:
           restore-keys: node-modules-
       - run: yarn install --frozen-lockfile
       - run: yarn nx show projects
+      - name: Derive appropriate SHAs for base and head
+        uses: nrwl/nx-set-shas@v4
 
       - name: Restore eslint cache files
         uses: actions/cache@v5
         with:
           path: ~/.eslint
-          # 1. Only hash configs and lockfiles to save CI boot time.
-          # 2. Add github.sha so it saves a fresh, updated cache at the end of every run.
-          key: eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-${{ github.sha }}
+          key: eslint-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
           restore-keys: |
-            eslint-${{ runner.os }}-${{ hashFiles('yarn.lock', '.eslintrc*', 'eslint.config.*', 'nx.json') }}-
+            eslint-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             eslint-${{ runner.os }}-
       - name: Run lint
         run: 'yarn eslint . --cache --cache-strategy content --cache-location ~/.eslint/'
 
+      - name: Monitor memory usage
+        run: free -m
+      - run: yarn jest --showConfig
+        
       - name: Count affected projects with test target
         id: count-test
         uses: ./.github/actions/count-affected-projects
         with:
           target: test
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Jest cache files
         if: steps.count-test.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: .jest/cache
-          key: jest-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          key: jest-pr-${{ github.event.pull_request.number }}
           restore-keys: |
             jest-pr-${{ github.event.pull_request.number }}-
             jest-full-
@@ -61,28 +67,26 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest --cache --cacheDirectory=.jest/cache
+          yarn jest --changedSince=${{ env.NX_BASE }}
 
       - name: Count affected projects with build target
         id: count-build
         uses: ./.github/actions/count-affected-projects
         with:
           target: build
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore Next.js Build Cache
         if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
-          # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
           path: |
             node_modules/.cache/next
-            ${{ github.workspace }}/.next
-          # Generate a new cache whenever packages or source files change.
-          key: nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-${{ github.sha }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
+            apps/*/.next/cache
+          key: nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
           restore-keys: |
-            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', 'apps/**/next.config.js', 'libs/**/next.config.js', 'apps/**/tsconfig.json', 'libs/**/tsconfig.json', 'nx.json') }}-
-            nextjs-cache-pr-${{ github.event.pull_request.number }}-${{ runner.os }}-nextjs-
-            nextjs-cache-full-
+            nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
+            nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         run: 'yarn build:all'
 
@@ -91,6 +95,8 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: e2e
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Cache Playwright Browsers
         if: steps.count-e2e.outputs.count > 0
         uses: actions/cache@v5
@@ -110,7 +116,7 @@ jobs:
         run: npx playwright install
       - name: Run e2e
         if: steps.count-e2e.outputs.count > 0
-        run: yarn run e2e:all
+        run: yarn run e2e:all:affected
         continue-on-error: true
 
       - name: Count affected projects with typecheck target
@@ -118,6 +124,8 @@ jobs:
         uses: ./.github/actions/count-affected-projects
         with:
           target: typecheck
+          base: ${{ env.NX_BASE }}
+          head: ${{ env.NX_HEAD }}
       - name: Restore TypeScript build info
         if: steps.count-typecheck.outputs.count > 0
         uses: actions/cache@v5
