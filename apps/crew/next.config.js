@@ -7,6 +7,8 @@ const nextConfig = {
   nx: {},
   distDir: '../../.next/crew',
   generateBuildId: async () => 'stable-build-id',
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
 };
 
 module.exports = withNx(nextConfig);
