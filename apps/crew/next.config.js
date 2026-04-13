@@ -8,6 +8,9 @@ const nextConfig = {
   distDir: '../../.next/crew',
   generateBuildId: async () => 'stable-build-id',
   typescript: { ignoreBuildErrors: true },
+  experimental: {
+    turbopackFileSystemCacheForBuild: true,
+  },
 };
 
 module.exports = withNx(nextConfig);

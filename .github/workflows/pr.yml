@@ -110,6 +110,12 @@ jobs:
       - name: Run build
         if: steps.count-build.outputs.count > 0
         run: 'yarn build:all'
+      - name: Debug Next.js cache sizes
+        if: steps.count-build.outputs.count > 0
+        run: |
+          for p in node_modules/.cache/next .next/crew/cache .next/flight-simulator/cache .next/navigation/cache .next/ticket-booking/cache .next/warp-drive-manager/cache; do
+            if [ -d "$p" ]; then du -sh "$p"; else echo "$p (missing)"; fi
+          done
 
       - name: Count affected projects with e2e target
         id: count-e2e
