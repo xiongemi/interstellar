@@ -79,7 +79,6 @@ jobs:
           base: ${{ env.NX_BASE }}
           head: ${{ env.NX_HEAD }}
       - name: Restore Next.js Build Cache
-        if: steps.count-build.outputs.count > 0
         uses: actions/cache@v5
         with:
           path: |
@@ -111,13 +110,11 @@ jobs:
       # Always install OS packages: browser cache restore skips install, and WebKit needs
       # libs like libwoff2dec that --with-deps would otherwise apt-install.
       - name: Install Playwright system dependencies
-        if: steps.count-e2e.outputs.count > 0
         run: npx playwright install-deps
       - name: Install Playwright Browsers
-        if: steps.count-e2e.outputs.count > 0 && steps.playwright-cache.outputs.cache-hit != 'true'
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install
       - name: Run e2e
-        if: steps.count-e2e.outputs.count > 0
         run: yarn run e2e:all:affected
         continue-on-error: true
 
