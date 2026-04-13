@@ -76,7 +76,7 @@ jobs:
         if: steps.count-test.outputs.count > 0
         run: |
           mkdir -p .jest/cache
-          yarn jest --cache --cacheDirectory=.jest/cache
+          yarn jest --cache
 
       - name: Count affected projects with build target
         id: count-build
