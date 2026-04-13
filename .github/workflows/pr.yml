@@ -83,10 +83,9 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            .next/*/cache
-          key: nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
+            .next
+          key: nextjs-cache-${{ runner.os }}-nextjs-${{ hashFiles('yarn.lock', '**/next.config.js') }}
           restore-keys: |
-            nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
             nextjs-cache-${{ runner.os }}-nextjs-
       - name: Run build
         run: 'yarn build:all'
