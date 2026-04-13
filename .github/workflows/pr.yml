@@ -83,7 +83,7 @@ jobs:
         with:
           path: |
             node_modules/.cache/next
-            apps/*/.next/cache
+            .next/*/cache
           key: nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}
           restore-keys: |
             nextjs-cache-${{ runner.os }}-pr-${{ github.event.pull_request.number }}-
