@@ -5,7 +5,10 @@
   "private": true,
   "scripts": {
     "build:all": "yarn next build apps/crew && yarn next build apps/flight-simulator && yarn next build apps/navigation && yarn next build apps/ticket-booking && yarn next build apps/warp-drive-manager",
-    "e2e:all": "yarn playwright test -c apps/crew-e2e/playwright.config.ts && yarn playwright test -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test -c apps/navigation-e2e/playwright.config.ts && yarn playwright test -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test -c apps/warp-drive-manager-e2e/playwright.config.ts"
+    "e2e:all": "yarn playwright test -c apps/crew-e2e/playwright.config.ts && yarn playwright test -c apps/flight-simulator-e2e/playwright.config.ts && yarn playwright test -c apps/navigation-e2e/playwright.config.ts && yarn playwright test -c apps/ticket-booking-e2e/playwright.config.ts && yarn playwright test -c apps/warp-drive-manager-e2e/playwright.config.ts",
+    "tia": "node tools/tia/tia.mjs",
+    "tia:test": "node tools/tia/tia.mjs --run --runner jest",
+    "tia:e2e": "node tools/tia/tia.mjs --run --runner playwright"
   },
   "dependencies": {
     "core-js": "^3.6.5",
