@@ -15,13 +15,29 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          REF: refs/pull/${{ github.event.pull_request.number }}/merge
         run: |
           gh extension install actions/gh-actions-cache
 
-          echo "Deleting caches for PR $PR_NUMBER"
+          echo "Deleting caches for PR $PR_NUMBER on ref $REF"
 
+          # 1. Delete standard PR-specific caches (like ESLint or Jest)
+          # We use cut -f1 to get the key and cut -f2 to get the ID if needed
           gh actions-cache list -R ${{ github.repository }} | grep "pr-$PR_NUMBER" | cut -f1 | while read cacheKey
           do
-            echo "Deleting $cacheKey"
-            gh actions-cache delete $cacheKey -R ${{ github.repository }} --confirm
+            if [[ -n "$cacheKey" ]]; then
+              echo "Deleting every instance of cache key: $cacheKey"
+              # Deleting by key deletes ALL entries for that key name
+              gh actions-cache delete "$cacheKey" -R ${{ github.repository }} --confirm
+            fi
+          done
+
+          # 2. Delete Next.js caches saved on this specific PR ref
+          # The list command supports --ref to find caches saved only on this PR's merge branch
+          gh actions-cache list -R ${{ github.repository }} --ref "$REF" | cut -f1 | while read cacheKey
+          do
+            if [[ -n "$cacheKey" ]]; then
+              echo "Deleting PR-specific ref cache: $cacheKey"
+              gh actions-cache delete "$cacheKey" -R ${{ github.repository }} --confirm
+            fi
           done
