@@ -1,0 +1,153 @@
+name: TIA vs Full Jest
+
+# Runs the affected-only test selection (Test Impact Analysis) AND a full `yarn jest`
+# on the same commit, times both, and writes a side-by-side comparison to the job
+# summary. This workflow deliberately runs the full suite too — it exists to measure
+# what TIA saves, not just to gate the PR.
+#
+# See docs/blog/test-impact-analysis-for-monorepos.md and tools/tia/README.md.
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Git ref to diff against (default: origin/main)'
+        required: false
+        default: 'origin/main'
+
+env:
+  NODE_OPTIONS: '--max_old_space_size=4096'
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: node-modules-
+
+      - run: yarn install --frozen-lockfile
+
+      # tia diffs against a base ref via merge-base, so that ref must exist locally.
+      - name: Resolve base ref
+        id: base
+        run: |
+          if [ -n "${{ github.base_ref }}" ]; then
+            git fetch --no-tags --quiet origin "${{ github.base_ref }}"
+            echo "ref=origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            REF="${{ github.event.inputs.base || 'origin/main' }}"
+            git fetch --no-tags --quiet origin "${REF#origin/}" || true
+            echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ------------------------------------------------------------------
+      # 1. TIA selection (print what it picked; writes tools/tia/tia-affected.json)
+      # ------------------------------------------------------------------
+      - name: TIA — selection
+        run: yarn tia --base ${{ steps.base.outputs.ref }}
+
+      # ------------------------------------------------------------------
+      # 2. Run ONLY the affected tests (timed). Its own cache dir (.jest/cache)
+      #    so it doesn't warm the full run below.
+      # ------------------------------------------------------------------
+      - name: Run TIA-selected tests (timed)
+        id: run_tia
+        run: |
+          mkdir -p .jest/cache
+          start=$SECONDS
+          set +e
+          yarn tia:test --base ${{ steps.base.outputs.ref }}
+          code=$?
+          set -e
+          echo "seconds=$((SECONDS - start))" >> "$GITHUB_OUTPUT"
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------
+      # 3. Run the FULL suite (timed) in a separate cache dir so the two runs
+      #    start from the same cold state and neither warms the other.
+      # ------------------------------------------------------------------
+      - name: Run full jest (timed)
+        id: run_full
+        if: always()
+        run: |
+          start=$SECONDS
+          set -o pipefail
+          set +e
+          yarn jest --watchman=false --cacheDirectory=.jest/full-cache 2>&1 | tee full-jest.log
+          code=$?
+          set -e
+          echo "seconds=$((SECONDS - start))" >> "$GITHUB_OUTPUT"
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------
+      # 4. Comparison → job summary
+      # ------------------------------------------------------------------
+      - name: Comparison summary
+        if: always()
+        run: |
+          AFFECTED_JSON=tools/tia/tia-affected.json
+          SEL=$(node -e "console.log(require('./$AFFECTED_JSON').affectedTestFiles)")
+          RUNALL=$(node -e "console.log(require('./$AFFECTED_JSON').runEverything)")
+          TRIGGERS=$(node -e "console.log(require('./$AFFECTED_JSON').globalTriggers.join(', ') || '—')")
+          PROJECTS=$(node -e "console.log(require('./$AFFECTED_JSON').affectedTestProjects.length)")
+          TOTAL=$(node -e "console.log(require('./$AFFECTED_JSON').runEverything ? require('./$AFFECTED_JSON').affectedTestFiles : 0)")
+          # total specs in the workspace (jest, excluding e2e)
+          TOTAL_SPECS=$(find libs apps -type f \( -name '*.spec.ts' -o -name '*.spec.tsx' \) -not -path '*-e2e/*' | wc -l | tr -d ' ')
+
+          T_TIA=${{ steps.run_tia.outputs.seconds }}
+          T_FULL=${{ steps.run_full.outputs.seconds }}
+          X_TIA=${{ steps.run_tia.outputs.exit }}
+          X_FULL=${{ steps.run_full.outputs.exit }}
+
+          status() { [ "$1" = "0" ] && echo "✅ pass" || echo "❌ fail"; }
+          SPEEDUP=$(awk -v f="$T_FULL" -v t="$T_TIA" 'BEGIN { if (t>0) printf "%.1f×", f/t; else printf "—" }')
+          SAVED=$(awk -v s="$SEL" -v n="$TOTAL_SPECS" 'BEGIN { if (n>0) printf "%.1f%%", (1-s/n)*100; else printf "—" }')
+
+          {
+            echo "## 🧪 TIA vs full Jest"
+            echo ""
+            echo "Base: \`${{ steps.base.outputs.ref }}\`"
+            echo ""
+            echo "| Strategy | Tests run | Projects | Wall time | Result |"
+            echo "|---|--:|--:|--:|:--|"
+            echo "| Full \`yarn jest\` | $TOTAL_SPECS | all | ${T_FULL}s | $(status $X_FULL) |"
+            echo "| **TIA** \`yarn tia:test\` | $SEL | $PROJECTS | ${T_TIA}s | $(status $X_TIA) |"
+            echo ""
+            echo "- **Speedup:** ${SPEEDUP} faster wall time"
+            echo "- **Selection:** ran $SEL of $TOTAL_SPECS specs (${SAVED} skipped)"
+            if [ "$RUNALL" = "true" ]; then
+              echo "- ⚠️ **Global fallback triggered** by: \`$TRIGGERS\` — TIA ran the whole suite (no savings expected on this PR)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------------
+      # 5. Gate: the PR check fails only if the TIA-selected tests fail.
+      #    (The full run is informational for the comparison above.)
+      # ------------------------------------------------------------------
+      - name: Gate on TIA test result
+        if: always()
+        run: |
+          if [ "${{ steps.run_tia.outputs.exit }}" != "0" ]; then
+            echo "TIA-selected tests failed."
+            exit 1
+          fi
+          echo "TIA-selected tests passed."

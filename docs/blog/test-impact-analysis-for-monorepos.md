@@ -13,7 +13,24 @@ Test Impact Analysis (TIA) is the technique of running only the tests that a cha
 3. Select the tests that transitively depend on the changed code.
 4. Run only those.
 
-Done right, a one-line fix runs 2 tests in under a second instead of 26,000 tests in 20 minutes. Done wrong, it skips the one test that would have caught your bug.
+Done right, a one-line fix runs 2 tests in under a second instead of the entire suite. Done wrong, it skips the one test that would have caught your bug.
+
+---
+
+## This monorepo, by the numbers
+
+To make the trade-offs concrete, here's the workspace this post is measured against — a synthetic-but-realistic Nx monorepo modeled on a large product codebase:
+
+- **115 Nx projects** — 5 Next.js apps (`crew`, `flight-simulator`, `navigation`, `ticket-booking`, `warp-drive-manager`), their 5 Playwright e2e projects, 5 shared UI libraries (`icons`, `components`, `buttons`, `alerts`, `dialogs`), and 100 feature libraries.
+- **53,072 TypeScript source files** — the dependency graph across them is 79,432 nodes and 227,920 edges.
+- **26,360 Jest spec files** (≈ 26,365 `it`/`test` cases — roughly one render test per component), plus **5 Playwright e2e** specs.
+
+And the number that motivates all of this — the full Jest run:
+
+- **Full suite: 26,360 suites / 26,360 tests, all green, in ~204 s (≈ 3.4 minutes)** — Jest's own reported wall time on a dev machine at 50% workers with the SWC transform. On a single `ubuntu-latest` CI runner (fewer cores, cold cache) it is materially slower, and that time is paid on *every* PR push.
+- **With TIA: a one-line leaf change runs 2 tests in ~0.7 s** — the graph build that decides this takes ~7 s once.
+
+So the whole point is turning a ~3.4-minute (and on CI, longer) tax on every change into a sub-second one — *when the dependency graph is precise enough to allow it*. The rest of this post is about when it is, and when barrels quietly take that precision away.
 
 ---
 
@@ -52,6 +69,40 @@ Now change a file in `libs/shared/icons` and run Jest's changed-file mode. Two t
 1. **Per-project graphs don't compose.** Nx runs Jest with a *multi-project* root config — 115 separate project configs, each with its own `roots`, `moduleNameMapper`, and transform. `--changedSince` computes "related tests" **within each project's own file set**. The changed file lives in the `shared-icons` project; the tests that depend on it live in `crew-*`, `navigation-*`, etc. Nothing connects the changed file in one project to the dependent tests in another. Result: Jest runs `shared-icons`' own tests and **skips every downstream consumer** — a false negative.
 
 2. **Alias resolution is inconsistent.** Whether a runner even *sees* the edge depends on it resolving `@interstellar/shared/icons` → the real file the same way the TypeScript compiler does. Jest does it via `moduleNameMapper`, Vitest via its resolver, Playwright not at all for unit-style graphs. The graph the runner walks is not the graph your code actually has.
+
+The picture for (1) — the change and the tests that *should* react to it, versus what each project's `--changedSince` can actually see:
+
+```text
+git says 1 file changed:  libs/shared/icons/src/lib/icon0/icon0.tsx
+
+
+(A) REALITY — a single graph; the import edge crosses project boundaries
+
+    shared-icons · icon0.tsx   ● CHANGED
+        │
+        │  re-exported by the barrel, imported as
+        │  '@interstellar/shared/icons'  from every app and lib
+        ▼
+        ├──▶ shared-icons      · icon0.spec.tsx        ✅ SHOULD RUN
+        ├──▶ crew-*            · component.spec.tsx     ✅ SHOULD RUN
+        ├──▶ navigation-*      · component.spec.tsx     ✅ SHOULD RUN
+        ├──▶ ticket-booking-*  · component.spec.tsx     ✅ SHOULD RUN
+        └──▶ warp-drive-*      · component.spec.tsx     ✅ SHOULD RUN
+
+
+(B) WHAT  jest --changedSince  SEES — 115 project graphs, none connected
+
+    project shared-icons
+        │  git-changed ∩ my file-set = { icon0.tsx }
+        └──▶ icon0.spec.tsx                            ✅ RUN
+
+    project navigation-*   (and crew-*, ticket-booking-*, warp-drive-*)
+        │  git-changed ∩ my file-set = { }     ← icon0 is not in my roots
+        │  the '@interstellar/shared/icons' edge is invisible across the border
+        └──▶ (nothing selected)                        ❌ SKIPPED   ← false negative
+```
+
+Each project's `--changedSince` intersects the git-changed set with *its own* files. `shared-icons` finds `icon0.tsx` and runs one test; every consumer project finds an empty intersection and runs nothing — even though their components import the changed file. The edge exists in your code; it does not exist in any single project's graph.
 
 Under-selection is the dangerous failure mode: **your CI goes green because it didn't run the test that would have gone red.** This is why the repo guidance says plainly: *"the jest `--changedSince` flag does not work for monorepo."* It's not a bug in Jest — it's a category error. `--changedSince` was never designed to reason across project boundaries.
 
